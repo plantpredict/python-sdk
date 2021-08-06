@@ -1,0 +1,17 @@
+.toggle .header {
+    display: block;
+    clear: both;
+}
+
+.toggle .header:after {
+    content: " (Show)";
+    font-weight: bold;
+    color: blue;
+}
+
+.toggle .header.open:after {
+    content: " (Hide)";
+    font-weight: bold;
+    text-decoration: bold;
+    color: blue;
+}

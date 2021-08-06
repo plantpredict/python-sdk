@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# emacs temp files
+*~
+#*#
+
+# Distribution / packaging
+*.egg-info/
+.installed.cfg
+*.egg*
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE's (Mr Developer, pydev, pycharm...)
+.mr.developer.cfg
+.project
+.pydevproject
+.spyderproject
+.idea/
+*.sublime-project
+*.sublime-workspace

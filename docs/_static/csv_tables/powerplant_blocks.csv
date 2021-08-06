@@ -1,0 +1,12 @@
+Key,Type,Description
+name,int,
+nodal_export_options,,
+result_list,list,
+arrays,list,
+energization_date,str,
+use_energization_date,bool,
+number_of_modules,float,
+total_module_area,float,
+repeater,int,
+id,int,
+description,str,
