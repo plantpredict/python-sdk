@@ -8,7 +8,7 @@ setup(
     name='plantpredict',
     version='0.9.4',
     description='Python SDK for PlantPredict (https://ui.plantpredict.com).',
-    url='https://github.com/stephenkaplan/plantpredict-python',
+    url='https://github.com/plantpredict/python-sdk',
     author='Stephen Kaplan, Performance & Prediction Engineer at First Solar, Inc.',
     author_email='stephen.kaplan@firstsolar.com',
     license='LICENSE.txt',

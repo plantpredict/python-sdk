@@ -13,9 +13,7 @@ Full documentation on the backend algorithms used in PlantPredict is available `
 <https://plantpredict.com/algorithm/introduction/>`_.
 
 The source code for plantpredict-python is available on `GitHub
-<https://github.com/FirstSolar/plantpredict-python>`_.
-
-Email **samantha.wilson@firstsolar.com** to sign up for important email updates.
+<https://github.com/plantpredict/python-sdk>`_.
 
 Contents
 =========
