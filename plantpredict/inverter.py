@@ -66,3 +66,14 @@ class Inverter(PlantPredictEntity):
             headers={"Authorization": "Bearer " + self.api.access_token},
             params={"elevation": elevation, "temperature": temperature, "useCoolingTemp": use_cooling_temp}
         )
+
+    @handle_refused_connection
+    @handle_error_response
+    def get_inverter_list(self):
+        """
+        :return: a list of all inverter to which a user has access.
+        """
+        return requests.get(
+            url=self.api.base_url + "/Inverter",
+            headers={"Authorization": "Bearer " + self.api.access_token},
+           )
