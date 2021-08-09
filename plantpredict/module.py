@@ -312,6 +312,17 @@ class Module(PlantPredictEntity):
 
     @handle_refused_connection
     @handle_error_response
+    def get_module_list(self):
+        """
+        :return: a list of all modules to which a user has access.
+        """
+        return requests.get(
+            url=self.api.base_url + "/Module",
+            headers={"Authorization": "Bearer " + self.api.access_token},
+           )
+
+    @handle_refused_connection
+    @handle_error_response
     def generate_single_diode_parameters_default(self):
         """
         **POST** */Module/Generator/GenerateSingleDiodeParametersDefault*
