@@ -6,7 +6,7 @@ __readme__ = os.path.join(__currdir__, 'README.md')
 
 setup(
     name='plantpredict',
-    version='0.9.4',
+    version='1.0.0',
     description='Python SDK for PlantPredict (https://ui.plantpredict.com).',
     url='https://github.com/plantpredict/python-sdk',
     author='Stephen Kaplan, Performance & Prediction Engineer at First Solar, Inc.',
