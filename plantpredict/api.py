@@ -34,6 +34,7 @@ class Api(object):
             self.access_token = json.loads(response.content)['access_token']
             self.refresh_token = json.loads(response.content)['refresh_token']
         except KeyError:
+            print("Authentification failed. Response:", response.text)
             pass
 
         return response
