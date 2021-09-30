@@ -10,7 +10,7 @@ class Weather(PlantPredictEntity):
     """
     The full contents of the Weather database entity (in JSON) can be found under
     "GET /Weather/{Id}" in `the general PlantPredict API documentation
-    <http://app.plantpredict.com/swagger/ui/index#!/Weather/Weather_Get_0>`_.
+    <https://api.plantpredict.com/swagger/ui/index#!/Weather/Weather_Get_0>`_.
     """
     def create(self):
         """
