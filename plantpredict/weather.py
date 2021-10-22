@@ -208,3 +208,20 @@ class Weather(PlantPredictEntity):
                 "note": note
             }]
         )
+
+    @handle_refused_connection
+    @handle_error_response
+    def generate_weather(self):
+        """
+        Post /Weather/GenerateWeather
+
+        Returns a synthetic weather time series based on monthly data. The monthly data must be defined as a list of dicts in a class attribute "monthly_values"
+
+        :returns: A dictionary with all weather parameters, including and especially hourly synthetic data in "weather_details".
+        :rtype: dict
+        """
+        return requests.post(
+            url=self.api.base_url + "/Weather/GenerateWeather",
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=convert_json(self.__dict__, snake_to_camel),
+        )
