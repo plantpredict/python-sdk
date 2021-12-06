@@ -24,7 +24,7 @@ Instantiate a local instance of :py:class:`~plantpredict.project.Project`, assig
 
 .. code-block:: python
 
-    project = api.project(name="Area 51 Alien Power Plant", latitude=37.23, longitude=-115.80)
+    project = api.project(name="Grand Canyon Power Plant", latitude=36.099, longitude=-112.112)
 
 Assign location attributes with helper method :py:meth:`~plantpredict.project.Project.assign_location_attributes`, and
 create as the local instance of :py:class:`~plantpredict.project.Project` a new entity in the PlantPredict database.
@@ -39,7 +39,7 @@ the newly created project) and :py:attr:`name`.
 
 .. code-block:: python
 
-    prediction = api.prediction(project_id=project.id, name="Area 51 - Contracted")
+    prediction = api.prediction(project_id=project.id, name="Grand Canyon - Contracted")
 
 Assign the :py:attr:`weather_id` corresponding to the weather file you want to use (assuming it already exists in the
 PlantPredict database).
