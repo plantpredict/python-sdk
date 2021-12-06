@@ -16,14 +16,14 @@ api = plantpredict.Api(
 )
 
 # instantiate a local instance of Project, assigning name, latitude, and longitude
-project = api.project(name="Area 51 Alien Power Plant", latitude=37.23, longitude=-115.80)
+project = api.project(name="Grand Canyon Power Plant", latitude=36.099, longitude=-112.112)
 
 # assign location attributes with helper method, and create in the PlantPredict database
 project.assign_location_attributes()
 project.create()
 
 # instantiate a local instance of Prediction, assigning project_id (from the newly created project) and name
-prediction = api.prediction(project_id=project.id, name="Area 51 - Contracted")
+prediction = api.prediction(project_id=project.id, name="Grand Canyon - Contracted")
 
 # assign the weather_id corresponding to the weather file you want to use (assuming it already exists in the
 # PlantPredict database).
