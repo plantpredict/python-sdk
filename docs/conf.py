@@ -57,8 +57,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'plantpredict-python'
-copyright = u'2020, Stephen Kaplan'
-author = u'Stephen Kaplan'
+copyright = u'2021, Terabase Energy'
+author = u'Jesse Milam'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
