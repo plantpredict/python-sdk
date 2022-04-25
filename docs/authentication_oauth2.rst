@@ -4,9 +4,9 @@
 API Authentication
 #######################
 
-PlantPredict uses the `Okta OpenID Connect & OAuth 2.0 API <https://developer.okta.com/docs/api/resources/oidc#token>`_
+PlantPredict uses the `Amazon Cognito & OAuth 2.0 API <https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html>`_
 for administering and managing access tokens. If you are a first time user of the PlantPredict API, you need a set of
-client credentials (username, password, client ID, and client secret).
+client credentials (client ID, and client secret).
 
 Step 1: Generate/receive client credentials.
 ======================================================
@@ -14,9 +14,7 @@ Step 1: Generate/receive client credentials.
 "I have never used PlantPredict and need an account".
 ------------------------------------------------------
 
-Email **support@plantpredict.com** and request a PlantPredict account. Provide some information about yourself and your
-organization. Mention that you are interested in using the PlantPredict API via the Python SDK. Once you have an
-account, refer to the two options below for generating client credentials.
+Simply navigate to https://ui.plantpredict.com/signUp, provide the necessary information and complete your account registration.
 
 "I have a PlantPredict account and am the company administrator."
 ------------------------------------------------------------------
@@ -68,8 +66,6 @@ to generate an access token, which is stored on an :py:class:`~plantpredict.api.
     import plantpredict
 
     api = plantpredict.Api(
-        username="INSERT USERNAME FROM API CREDENTIALS",
-        password="INSERT PASSWORD FROM API CREDENTIALS",
         client_id="INSERT CLIENT_ID FROM API CREDENTIALS",
         client_secret="INSERT CLIENT_SECRET FROM API CREDENTIALS"
     )
