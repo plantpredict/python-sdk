@@ -27,7 +27,7 @@ def handle_error_response(function):
         try:
             # if the authorization is invalid, refresh the API access token
             if response.status_code == 401:
-                args[0].api.refresh_access_token()
+                args[0].api.__get_access_token()
 
             # if there is a sever side error, return the error message
             elif not 200 <= response.status_code < 300:

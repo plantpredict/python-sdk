@@ -17,12 +17,6 @@ class TestApi(unittest.TestCase):
         )
 
     @mock.patch('plantpredict.api.requests.post', new=mocked_requests.mocked_requests_post)
-    def test_refresh_access_token(self):
-        self.api.refresh_access_token()
-
-        self.assertEqual(self.api.access_token, "dummy access token 2")
-        self.assertEqual(self.api.refresh_token, "dummy refresh token 2")
-
     def test_init(self):
         self.assertEqual(self.api.base_url, "https://api.plantpredict.com")
         self.assertEqual(self.api.username, "dummy username")
