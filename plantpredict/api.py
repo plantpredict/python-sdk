@@ -17,13 +17,11 @@ class Api(object):
         """
         """
         response = requests.post(
-            url=self.__okta_auth_url,
+            url=self.auth_url,
             headers={"content-type": "application/x-www-form-urlencoded"},
             params={
-                "grant_type": "password",
-                "scope": "openid offline_access",
-                "username": self.username,
-                "password": self.password,
+                "grant_type": "client_credentials",
+                "scope": "transactions/post transactions/get",
                 "client_id": self.client_id,
                 "client_secret": self.client_secret
             }
@@ -32,47 +30,21 @@ class Api(object):
         # set authentication token as global variable
         try:
             self.access_token = json.loads(response.content)['access_token']
-            self.refresh_token = json.loads(response.content)['refresh_token']
         except KeyError:
             print("Authentification failed. Response:", response.text)
             pass
 
         return response
 
-    def refresh_access_token(self):
-        response = requests.post(
-            url=self.__okta_auth_url,
-            headers={"content-type": "application/x-www-form-urlencoded"},
-            params={
-                "refresh_token": self.refresh_token,
-                "grant_type": "refresh_token",
-                "scope": "offline_access",
-                "client_id": self.client_id,
-                "client_secret": self.client_secret
-            }
-        )
-
-        # set authentication token as global variable
-        try:
-            self.access_token = json.loads(response.content)['access_token']
-            self.refresh_token = json.loads(response.content)['refresh_token']
-        except KeyError:
-            pass
-
-        return response
-
-    def __init__(self, username, password, client_id, client_secret, base_url="https://api.plantpredict.com",
-                 okta_auth_url="https://afse.okta.com/oauth2/aus3jzhulkrINTdnc356/v1/token"):
+    def __init__(self, client_id, client_secret, base_url="https://api.plantpredict.com",
+                 auth_url="https://terabase-dev.auth.us-west-2.amazoncognito.com/oauth2/token"):
         self.base_url = base_url
-        self.__okta_auth_url = okta_auth_url
+        self.auth_url = auth_url
 
-        self.username = username
-        self.password = password
         self.client_id = client_id
         self.client_secret = client_secret
 
         self.access_token = None
-        self.refresh_token = None
 
         self.__get_access_token()
 

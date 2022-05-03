@@ -5,8 +5,6 @@ import plantpredict
 
 # authenticate using API credentials
 api = plantpredict.Api(
-    username="insert username here",
-    password="insert password here",
     client_id="insert client_id here",
     client_secret="insert client_secret here"
 )

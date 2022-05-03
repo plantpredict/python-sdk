@@ -51,8 +51,7 @@ class TestGeo(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         mock_api_post.return_value.ok = True
         mock_api_post.return_value.content = '''{"access_token":"dummy_access_token",
                                             "refresh_token":"dummy_refresh_token"}'''
-        api = plantpredict.Api(username="FS123456@firstsolar.com.plantpredictapi",
-                               password="0xt2Zf", client_id="0oakq", client_secret="IEdpr")
+        api = plantpredict.Api(client_id="0oakq", client_secret="IEdpr")
 
         geo = Geo(api=api, latitude=39.67, longitude=-105.21)
         self.assertIsInstance(geo, Geo)
