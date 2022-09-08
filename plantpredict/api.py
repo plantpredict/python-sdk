@@ -29,7 +29,7 @@ class Api(object):
 
         # set authentication token as global variable
         try:
-            self.access_token = json.loads(response.content)['access_token']
+            self.access_token = response.json()['access_token']
         except KeyError:
             print("Authentification failed. Response:", response.text)
             pass
