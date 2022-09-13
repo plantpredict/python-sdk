@@ -16,7 +16,7 @@ class TestPlantPredictEntity(plantpredict_unit_test_case.PlantPredictUnitTestCas
         ppe.create_url_suffix = "/create-info/80206"
 
         response = ppe.create()
-        self.assertEqual(json.loads(response.content), {"id": 35})
+        self.assertEqual(response.json(), {"id": 35})
         self.assertEqual(ppe.id, 35)
 
     @mock.patch('plantpredict.plant_predict_entity.requests.delete', mocked_requests.mocked_requests_delete)
@@ -26,7 +26,7 @@ class TestPlantPredictEntity(plantpredict_unit_test_case.PlantPredictUnitTestCas
         ppe.delete_url_suffix = "/delete-info/80206"
 
         response = ppe.delete()
-        self.assertEqual(json.loads(response.content), {"success": True})
+        self.assertEqual(response.json(), {"success": True})
 
     @mock.patch('plantpredict.plant_predict_entity.requests.get', mocked_requests.mocked_requests_get)
     def test_get_success(self):
@@ -35,7 +35,7 @@ class TestPlantPredictEntity(plantpredict_unit_test_case.PlantPredictUnitTestCas
         ppe.get_url_suffix = "/get-info/80206"
 
         response = ppe.get()
-        self.assertEqual(json.loads(response.content), {"color": "blue"})
+        self.assertEqual(response.json(), {"color": "blue"})
         self.assertEqual(ppe.color, "blue")
 
     @mock.patch('plantpredict.plant_predict_entity.requests.get', mocked_requests.mocked_requests_get)
@@ -57,7 +57,7 @@ class TestPlantPredictEntity(plantpredict_unit_test_case.PlantPredictUnitTestCas
         ppe.update_url_suffix = "/update-info/80206"
 
         response = ppe.update()
-        self.assertEqual(json.loads(response.content), {"color": "red"})
+        self.assertEqual(response.json(), {"color": "red"})
 
     def test_init(self):
         self._make_mocked_api()

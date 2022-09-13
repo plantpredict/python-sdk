@@ -231,7 +231,7 @@ class TestModule(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         module = Module(api=self.mocked_api)
 
         response = module.process_key_iv_points(file_path="test_data/test_parse_key_iv_points_template.xlsx")
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
             "stc_short_circuit_current": 1.7592,
             "stc_open_circuit_voltage": 90.2189,
             "stc_mpp_current": 1.6084,
@@ -281,7 +281,7 @@ class TestModule(plantpredict_unit_test_case.PlantPredictUnitTestCase):
                 "max_power": 341.6237
             }
         ])
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
             "stc_short_circuit_current": 1.7592,
             "stc_open_circuit_voltage": 90.2189,
             "stc_mpp_current": 1.6084,
@@ -339,7 +339,7 @@ class TestModule(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         module = Module(self.mocked_api)
 
         response = module.calculate_effective_irradiance_response()
-        self.assertEqual(json.loads(response.content), [
+        self.assertEqual(response.json(), [
             {'temperature': 25, 'irradiance': 1000, 'relative_efficiency': 1.0},
             {'temperature': 25, 'irradiance': 800, 'relative_efficiency': 1.02},
             {'temperature': 25, 'irradiance': 600, 'relative_efficiency': 1.001},
@@ -353,7 +353,7 @@ class TestModule(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         module = Module(self.mocked_api)
 
         response = module.generate_single_diode_parameters_advanced()
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
             "maximum_series_resistance": 6.0,
             "maximum_recombination_parameter": 2.5,
             "saturation_current_at_stc": 0.0000000012,
@@ -369,7 +369,7 @@ class TestModule(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         module = Module(self.mocked_api)
 
         response = module.generate_single_diode_parameters_default()
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
             "maximum_series_resistance": 6.0,
             "maximum_recombination_parameter": 2.5,
             "saturation_current_at_stc": 0.0000000012,
@@ -385,7 +385,7 @@ class TestModule(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         module = Module(self.mocked_api)
 
         response = module.optimize_series_resistance()
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
             "maximum_series_resistance": 6.0,
             "maximum_recombination_parameter": 2.5,
             "saturation_current_at_stc": 0.0000000012,

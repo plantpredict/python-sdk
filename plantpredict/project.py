@@ -126,7 +126,7 @@ class Project(PlantPredictEntity):
             params={'latitude': latitude, 'longitude': longitude, 'searchRadius': search_radius}
         )
 
-        project_list = json.loads(response.content)
+        project_list = response.json()
 
         return [convert_json(p, camel_to_snake) for p in project_list]
 

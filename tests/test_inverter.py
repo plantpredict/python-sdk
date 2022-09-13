@@ -49,7 +49,7 @@ class TestInverter(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         inverter = Inverter(api=self.mocked_api, id=808)
         response = inverter.get_kva(elevation=1000, temperature=20, use_cooling_temp=True)
 
-        self.assertEqual(json.loads(response.content)['kva'], 700.0)
+        self.assertEqual(response.json()['kva'], 700.0)
 
 
 if __name__ == '__main__':

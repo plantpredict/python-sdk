@@ -156,7 +156,7 @@ class Weather(PlantPredictEntity):
             }, snake_to_camel)
         )
 
-        weather_list = json.loads(response.content)
+        weather_list = response.json()
 
         return [convert_json(w, camel_to_snake) for w in weather_list]
 
@@ -181,7 +181,7 @@ class Weather(PlantPredictEntity):
             params={'latitude': latitude, 'longitude': longitude}
         )
 
-        self.id = json.loads(response.content)['id'] if 200 <= response.status_code < 300 else None
+        self.id = response.json()['id'] if 200 <= response.status_code < 300 else None
 
         return response
 

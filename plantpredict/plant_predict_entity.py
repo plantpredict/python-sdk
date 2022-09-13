@@ -18,7 +18,7 @@ class PlantPredictEntity(object):
 
         # power plant is the exception that doesn't have its own id. has a project and prediction id
         try:
-            self.id = json.loads(response.content)['id'] if 200 <= response.status_code < 300 else None
+            self.id = response.json()['id'] if 200 <= response.status_code < 300 else None
         except ValueError:
             pass
 
@@ -41,7 +41,7 @@ class PlantPredictEntity(object):
         if response.status_code == 404:
             raise APIError(response.status_code, response.content)
         else:
-            attr = convert_json(json.loads(response.content), camel_to_snake)
+            attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
             setattr(self, key, attr[key])
 

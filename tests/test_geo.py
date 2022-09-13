@@ -14,7 +14,7 @@ class TestGeo(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         geo = Geo(api=self.mocked_api, latitude=39.67, longitude=-105.21)
         response = geo.get_location_info()
 
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
             "country": "United States",
             "country_code": "US",
             "locality": "Morrison",
@@ -35,7 +35,7 @@ class TestGeo(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         geo = Geo(api=self.mocked_api, latitude=39.67, longitude=-105.21)
         response = geo.get_elevation()
 
-        self.assertEqual(json.loads(response.content), {"elevation": 1965.96})
+        self.assertEqual(response.json(), {"elevation": 1965.96})
         self.assertEqual(geo.elevation, 1965.96)
 
     @mock.patch('plantpredict.geo.requests.get', new=mocked_requests.mocked_requests_get)
@@ -44,7 +44,7 @@ class TestGeo(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         geo = Geo(api=self.mocked_api, latitude=39.67, longitude=-105.21)
         response = geo.get_time_zone()
 
-        self.assertEqual(json.loads(response.content), {"time_zone": -7.0})
+        self.assertEqual(response.json(), {"time_zone": -7.0})
 
     @mock.patch('plantpredict.api.requests.post', autospec=True)
     def test_init(self, mock_api_post):
