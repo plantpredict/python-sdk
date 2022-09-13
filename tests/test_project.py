@@ -49,7 +49,7 @@ class TestProject(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         project = Project(api=self.mocked_api, id=710)
 
         response = project.get_all_predictions()
-        self.assertEqual(json.loads(response.content), [
+        self.assertEqual(response.json(), [
             {"project_id": 1, "name": "Project 1"},
             {"project_id": 2, "name": "Project 2"},
             {"project_id": 3, "name": "Project 3"}

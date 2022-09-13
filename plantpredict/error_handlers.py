@@ -39,14 +39,14 @@ def handle_error_response(function):
                 # if the response contains content, return it
                 if response.content:
                     if "Queue" in response.url:
-                        return json.loads(response.content)
+                        return response.json()
 
                     else:
                         # if it is a list, use convert_json method in list comprehension
-                        if isinstance(json.loads(response.content), list):
-                            return [convert_json(i, camel_to_snake) for i in json.loads(response.content)]
+                        if isinstance(response.json(), list):
+                            return [convert_json(i, camel_to_snake) for i in response.json()]
                         else:
-                            return convert_json(json.loads(response.content), camel_to_snake)
+                            return convert_json(response.json(), camel_to_snake)
 
                 # if the response does not contain content, return a generic success message
                 else:

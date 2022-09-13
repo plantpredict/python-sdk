@@ -393,7 +393,7 @@ class Module(PlantPredictEntity):
             json=convert_json(self.__dict__, snake_to_camel)
         )
 
-        self.__dict__.update(convert_json(json.loads(response.content), camel_to_snake))
+        self.__dict__.update(convert_json(response.json(), camel_to_snake))
 
         return response
 
@@ -472,7 +472,7 @@ class Module(PlantPredictEntity):
             json=convert_json(self.__dict__, snake_to_camel)
         )
 
-        self.__dict__.update(convert_json(json.loads(response.content), camel_to_snake))
+        self.__dict__.update(convert_json(response.json(), camel_to_snake))
 
         return response
 
@@ -651,7 +651,7 @@ class Module(PlantPredictEntity):
             json=convert_json(self.__dict__, snake_to_camel)
         )
 
-        self.__dict__.update(convert_json(json.loads(response.content), camel_to_snake))
+        self.__dict__.update(convert_json(response.json(), camel_to_snake))
 
         return response
 
@@ -868,7 +868,7 @@ class Module(PlantPredictEntity):
             json=[convert_json(d, snake_to_camel) for d in key_iv_points_data]
         )
 
-        self.__dict__.update(convert_json(json.loads(response.content), camel_to_snake))
+        self.__dict__.update(convert_json(response.json(), camel_to_snake))
 
         return response
 
@@ -998,7 +998,7 @@ class Module(PlantPredictEntity):
             json=[convert_json(d, snake_to_camel) for d in iv_curve_data]
         )
 
-        return [convert_json(d, camel_to_snake) for d in json.loads(response.content)]
+        return [convert_json(d, camel_to_snake) for d in response.json()]
 
     @handle_refused_connection
     @handle_error_response

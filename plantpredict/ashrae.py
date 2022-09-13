@@ -26,7 +26,7 @@ class ASHRAE(object):
             headers={"Authorization": "Bearer " + self.api.access_token},
             params={"latitude": self.latitude, "longitude": self.longitude, "stationName": self.station_name}
         )
-        attr = convert_json(json.loads(response.content), camel_to_snake)
+        attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
             setattr(self, key, attr[key])
 
@@ -44,7 +44,7 @@ class ASHRAE(object):
             headers={"Authorization": "Bearer " + self.api.access_token},
             params={"latitude": self.latitude, "longitude": self.longitude}
         )
-        attr = convert_json(json.loads(response.content), camel_to_snake)
+        attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
             setattr(self, key, attr[key])
 

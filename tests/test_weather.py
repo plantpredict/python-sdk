@@ -50,7 +50,7 @@ class TestWeather(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         weather = Weather(api=self.mocked_api, id=999)
 
         response = weather.get_details()
-        self.assertEqual(json.loads(response.content), {"id": 999, "name": "Weather File"})
+        self.assertEqual(response.json(), {"id": 999, "name": "Weather File"})
 
     @mock.patch('plantpredict.weather.requests.get', new=mocked_requests.mocked_requests_get)
     def test_search(self):
@@ -66,7 +66,7 @@ class TestWeather(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         weather = Weather(api=self.mocked_api)
 
         response = weather.download(latitude=39.67, longitude=-105.21, provider=WeatherSourceTypeAPIEnum.METEONORM)
-        self.assertEqual(json.loads(response.content), {"id": 997, "name": "Downloaded Weather File"})
+        self.assertEqual(response.json(), {"id": 997, "name": "Downloaded Weather File"})
         self.assertEqual(weather.id, 997)
 
 

@@ -86,7 +86,7 @@ class Geo(object):
             url=self.api.base_url + "/Geo/{}/{}/Location".format(self.latitude, self.longitude),
             headers={"Authorization": "Bearer " + self.api.access_token}
         )
-        attr = convert_json(json.loads(response.content), camel_to_snake)
+        attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
             setattr(self, key, attr[key])
 
@@ -156,7 +156,7 @@ class Geo(object):
             url=self.api.base_url + "/Geo/{}/{}/Elevation".format(self.latitude, self.longitude),
             headers={"Authorization": "Bearer " + self.api.access_token}
         )
-        attr = convert_json(json.loads(response.content), camel_to_snake)
+        attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
             setattr(self, key, attr[key])
 
@@ -226,7 +226,7 @@ class Geo(object):
             url=self.api.base_url + "/Geo/{}/{}/TimeZone".format(self.latitude, self.longitude),
             headers={"Authorization": "Bearer " + self.api.access_token}
         )
-        attr = convert_json(json.loads(response.content), camel_to_snake)
+        attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
             setattr(self, key, attr[key])
 

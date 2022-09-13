@@ -71,7 +71,7 @@ class TestPrediction(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         prediction = Prediction(api=self.mocked_api, project_id=710, id=555)
 
         response = prediction.get_results_summary()
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
             "prediction_name": "Test Prediction", "block_result_summaries": [{"name": 1}]
         })
 
@@ -81,7 +81,7 @@ class TestPrediction(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         prediction = Prediction(api=self.mocked_api, project_id=710, id=555)
 
         response = prediction.get_results_details()
-        self.assertEqual(json.loads(response.content), {"prediction_name": "Test Prediction Details"})
+        self.assertEqual(response.json(), {"prediction_name": "Test Prediction Details"})
 
     @mock.patch('plantpredict.prediction.requests.get', new=mocked_requests.mocked_requests_get)
     def test_get_nodal_data(self):

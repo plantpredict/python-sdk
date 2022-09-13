@@ -13,7 +13,7 @@ class TestPrediction(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         ashrae = ASHRAE(api=self.mocked_api, latitude=35.0, longitude=-109.0)
         response = ashrae.get_station(station_name="TEST STATION")
 
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
                 "station_name": "TEST STATION",
                 "wmo": 18081,
                 "cool_996": 20.0,
@@ -31,7 +31,7 @@ class TestPrediction(plantpredict_unit_test_case.PlantPredictUnitTestCase):
         ashrae = ASHRAE(api=self.mocked_api, latitude=33.0, longitude=-110.0)
         response = ashrae.get_closest_station()
 
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(response.json(), {
                 "station_name": "TEST STATION",
                 "wmo": 18081,
                 "cool_996": 20.0,
