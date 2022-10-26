@@ -26,34 +26,34 @@ def mocked_requests_post(*args, **kwargs):
                 status_code=200
             )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/create-info/80206":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/create-info/80206":
         return MockResponse(
             json_data={"id": 35},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction/556/PowerPlant":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction/556/PowerPlant":
         return MockResponse(
             json_data={},
             status_code=204
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction/555/Run":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction/555/Run":
         return MockResponse(json_data={}, status_code=204)
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction/555/ResultSummary":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction/555/ResultSummary":
         return MockResponse(
             json_data={},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction":
         return MockResponse(
             json_data={"id": 556, "project_id": 710, "name": "Prediction Name 2"},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Weather/Download/1" and kwargs['params'] == {
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Weather/Download/1" and kwargs['params'] == {
         'latitude': 39.67, 'longitude': -105.21
     }:
         return MockResponse(
@@ -61,10 +61,10 @@ def mocked_requests_post(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/Generator/GenerateIVCurve":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/Generator/GenerateIVCurve":
         return [{"current": 1.2, "voltage": 100.0}]
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/Generator/ProcessIVCurves":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/Generator/ProcessIVCurves":
         return MockResponse(json_data=[
             {
                 "temperature": 25,
@@ -86,7 +86,7 @@ def mocked_requests_post(*args, **kwargs):
             }
         ], status_code=200)
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/Generator/ProcessKeyIVPoints":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/Generator/ProcessKeyIVPoints":
         return MockResponse(json_data={
             "stc_short_circuit_current": 1.7592,
             "stc_open_circuit_voltage": 90.2189,
@@ -104,7 +104,7 @@ def mocked_requests_post(*args, **kwargs):
             ]
         }, status_code=200)
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/Generator/CalculateEffectiveIrradianceResponse":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/Generator/CalculateEffectiveIrradianceResponse":
         return MockResponse(json_data=[
             {'temperature': 25, 'irradiance': 1000, 'relative_efficiency': 1.0},
             {'temperature': 25, 'irradiance': 800, 'relative_efficiency': 1.02},
@@ -113,7 +113,7 @@ def mocked_requests_post(*args, **kwargs):
             {'temperature': 25, 'irradiance': 200, 'relative_efficiency': 0.97}
         ], status_code=200)
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/Generator/GenerateSingleDiodeParametersAdvanced":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/Generator/GenerateSingleDiodeParametersAdvanced":
         return MockResponse(json_data={
             "maximum_series_resistance": 6.0,
             "maximum_recombination_parameter": 2.5,
@@ -123,7 +123,7 @@ def mocked_requests_post(*args, **kwargs):
             "light_generated_current": 1.8
         }, status_code=200)
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/Generator/GenerateSingleDiodeParametersDefault":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/Generator/GenerateSingleDiodeParametersDefault":
         return MockResponse(json_data={
             "maximum_series_resistance": 6.0,
             "maximum_recombination_parameter": 2.5,
@@ -133,7 +133,7 @@ def mocked_requests_post(*args, **kwargs):
             "light_generated_current": 1.8
         }, status_code=200)
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/Generator/OptimizeSeriesResistance":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/Generator/OptimizeSeriesResistance":
         return MockResponse(json_data={
             "maximum_series_resistance": 6.0,
             "maximum_recombination_parameter": 2.5,
@@ -147,7 +147,7 @@ def mocked_requests_post(*args, **kwargs):
 
 
 def mocked_requests_get(*args, **kwargs):
-    if kwargs['url'] == "https://api.plantpredict.com/Geo/39.67/-105.21/Location":
+    if kwargs['url'] == "https://api.plantpredict.terabase.energy/Geo/39.67/-105.21/Location":
         return MockResponse(
             json_data={
                 "country": "United States",
@@ -160,19 +160,19 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Geo/39.67/-105.21/Elevation":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Geo/39.67/-105.21/Elevation":
         return MockResponse(
             json_data={"elevation": 1965.96},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Geo/39.67/-105.21/TimeZone":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Geo/39.67/-105.21/TimeZone":
         return MockResponse(
             json_data={"time_zone": -7.0},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/123":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/123":
         return MockResponse(
             json_data={
                 "default_orientation": ModuleOrientationEnum.LANDSCAPE,
@@ -192,7 +192,7 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Module/456":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Module/456":
         return MockResponse(
             json_data={
                 "default_orientation": ModuleOrientationEnum.LANDSCAPE,
@@ -213,19 +213,19 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/get-info/80206":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/get-info/80206":
         return MockResponse(
             json_data={"color": "blue"},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/get-info/80207":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/get-info/80207":
         return MockResponse(
             content="Info not found.",
             status_code=404
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction/555/PowerPlant":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction/555/PowerPlant":
         return MockResponse(
             json_data={
                 "id": 1000,
@@ -245,28 +245,28 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction/555/ResultSummary":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction/555/ResultSummary":
         return MockResponse(
             json_data={"prediction_name": "Test Prediction", "block_result_summaries": [{"name": 1}]},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction/555/ResultDetails":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction/555/ResultDetails":
         return MockResponse(
             json_data={"prediction_name": "Test Prediction Details"},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction/555/NodalJson":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction/555/NodalJson":
         return {"nodal_data_dc_field": {}}
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction/555":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction/555":
         return MockResponse(
             json_data={"id": 555, "project_id": 710, "name": "Prediction Name"},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/710/Prediction":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/710/Prediction":
         return MockResponse(
             json_data=[
                 {"project_id": 1, "name": "Project 1"},
@@ -276,31 +276,31 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/Search":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/Search":
         return MockResponse(
             json_data=[{"project_id": 1, "name": "Project 1"}],
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/7":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/7":
         return MockResponse(
             json_data={"latitude": 33.0, "longitude": -110.0},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Project/8":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Project/8":
         return MockResponse(
             json_data={"latitude": -33.0, "longitude": -110.0},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Weather/999/Detail":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Weather/999/Detail":
         return MockResponse(
             json_data={"id": 999, "name": "Weather File"},
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Weather/Search" and kwargs['params'] == {
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Weather/Search" and kwargs['params'] == {
         'latitude': 39.67, 'longitude': -105.21, 'searchRadius': 1
     }:
         return MockResponse(
@@ -308,7 +308,7 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/ASHRAE/GetStation" and kwargs['params'] == {
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/ASHRAE/GetStation" and kwargs['params'] == {
         'latitude': 35.0, 'longitude': -109.0, 'stationName': 'TEST STATION'
     }:
         return MockResponse(
@@ -325,7 +325,7 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/ASHRAE" and kwargs['params'] == {
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/ASHRAE" and kwargs['params'] == {
         'latitude': 33.0, 'longitude': -110.0
     }:
         return MockResponse(
@@ -342,7 +342,7 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Inverter/808/kVa" and kwargs['params'] == {
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Inverter/808/kVa" and kwargs['params'] == {
         'elevation': 1000, 'temperature': 20.0, 'useCoolingTemp': True
     }:
         return MockResponse(
@@ -350,7 +350,7 @@ def mocked_requests_get(*args, **kwargs):
             status_code=200
         )
 
-    elif kwargs['url'] == "https://api.plantpredict.com/Inverter/808/":
+    elif kwargs['url'] == "https://api.plantpredict.terabase.energy/Inverter/808/":
         return MockResponse(
             json_data={'power_rated': 600.0},
             status_code=200
@@ -360,7 +360,7 @@ def mocked_requests_get(*args, **kwargs):
 
 
 def mocked_requests_delete(*args, **kwargs):
-    if kwargs['url'] == "https://api.plantpredict.com/delete-info/80206":
+    if kwargs['url'] == "https://api.plantpredict.terabase.energy/delete-info/80206":
         return MockResponse(
             json_data={"success": True},
             status_code=200
@@ -370,7 +370,7 @@ def mocked_requests_delete(*args, **kwargs):
 
 
 def mocked_requests_update(*args, **kwargs):
-    if kwargs['url'] == "https://api.plantpredict.com/update-info/80206":
+    if kwargs['url'] == "https://api.plantpredict.terabase.energy/update-info/80206":
         return MockResponse(
             json_data={"color": "red"},
             status_code=200

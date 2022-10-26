@@ -16,7 +16,7 @@ class TestApi(unittest.TestCase):
 
     @mock.patch('plantpredict.api.requests.post', new=mocked_requests.mocked_requests_post)
     def test_init(self):
-        self.assertEqual(self.api.base_url, "https://api.plantpredict.com")
+        self.assertEqual(self.api.base_url, "https://api.plantpredict.terabase.energy")
         self.assertEqual(self.api.client_id, "dummy client id")
         self.assertEqual(self.api.client_secret, "dummy client secret")
         self.assertEqual(self.api.access_token, "dummy access token")

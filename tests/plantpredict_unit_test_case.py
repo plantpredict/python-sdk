@@ -21,7 +21,7 @@ class PlantPredictUnitTestCase(unittest.TestCase):
     @mock.patch('plantpredict.api.Api')
     def _make_mocked_api(self, mocked_api, module_id=123):
         self.mocked_api = mocked_api()
-        self.mocked_api.base_url = "https://api.plantpredict.com"
+        self.mocked_api.base_url = "https://api.plantpredict.terabase.energy"
         self.mocked_api.access_token = 'dummy_token'
 
         self.mocked_api.prediction.return_value = Prediction(self.mocked_api)

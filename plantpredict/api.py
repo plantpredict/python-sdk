@@ -36,7 +36,7 @@ class Api(object):
 
         return response
 
-    def __init__(self, client_id, client_secret, base_url="https://api.plantpredict.com",
+    def __init__(self, client_id, client_secret, base_url="https://api.plantpredict.terabase.energy",
                  auth_url="https://terabase-prd.auth.us-west-2.amazoncognito.com/oauth2/token"):
         self.base_url = base_url
         self.auth_url = auth_url
