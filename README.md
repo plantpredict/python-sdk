@@ -2,7 +2,7 @@
 
 # plantpredict-python
 
-Install **latest stable version** (1.0.7) via: `pip install plantpredict`.
+Install **latest stable version** (1.0.8) via: `pip install plantpredict`.
 
 Install **development version** via Github master branch.
 
