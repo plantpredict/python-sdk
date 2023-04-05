@@ -24,4 +24,3 @@ pip-delete-this-directory.txt
 *.sublime-project
 *.sublime-workspace
 .vscode/settings.json
-build
