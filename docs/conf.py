@@ -65,7 +65,7 @@ author = u'Stephen Kaplan, Jesse Milam'
 # built documents.
 #
 # The short X.Y version.
-version = u'1.0.8'
+version = u'1.0.9'
 # The full version, including alpha/beta/rc tags.
 release = version
 

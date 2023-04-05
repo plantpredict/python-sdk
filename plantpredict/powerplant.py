@@ -130,7 +130,7 @@ class PowerPlant(PlantPredictEntity):
                     "id": 48373,
                     "length": 2.0,                             # units [km]
                     "resistance": 0.5,                         # units [Ohms/300 m]
-                    "number_of_conducters_per_phase": 3,
+                    "number_of_conductors_per_phase": 3,
                     "ordinal": 1
                 }]
 
@@ -374,7 +374,7 @@ class PowerPlant(PlantPredictEntity):
             "resistance": resistance,
             "number_of_conductors_per_phase": number_of_conductors_per_phase,
             "ordinal": ordinal
-        }
+            }
         # append new transmission line, or if list doesn't yet exist, create it
         try:
             self.transmission_lines.append(transmission_line)

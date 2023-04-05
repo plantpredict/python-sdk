@@ -64,20 +64,18 @@ MANUAL_KEY_FIXES = {
         "l_i_d": "lid",
         "at25": "at_25",
         "l_g_i_a": "lgia",
-        "number_of_conducters_per_phase": "number_of_conductors_per_phase",      # misspelled in PlantPredict backend
         "cool996": "cool_996",
         "heat996": "heat_996",
         "max50_year": "max_50_year",
         "min50_year": "min_50_year",
         "p_q": "pq",
         "kvacurves": "kva_curves",
-        "k_va": "kva"
+        "k_va": "kva",
     },
     "snake_to_camel": {
         "powerplant": "powerPlant",
         "backtracking": "backTracking",
-        "backsideMismatch": "backSideMismatch",
-        "numberOfConductorsPerPhase": "numberOfConductersPerPhase"              # misspelled in PlantPredict backend
+        "backsideMismatch": "backSideMismatch"
     }
 }
 

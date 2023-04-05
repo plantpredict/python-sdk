@@ -6,7 +6,7 @@ __readme__ = os.path.join(__currdir__, 'README.md')
 
 setup(
     name='plantpredict',
-    version='1.0.8',
+    version='1.0.9',
     description='Python SDK for PlantPredict (https://ui.plantpredict.terabase.energy).',
     url='https://github.com/plantpredict/python-sdk',
     author='Stephen Kaplan, Performance & Prediction Engineer at First Solar, Inc.',
