@@ -4,11 +4,9 @@ from setuptools import setup
 __currdir__ = os.getcwd()
 __readme__ = os.path.join(__currdir__, 'README.md')
 
-version = '1.0.10'
-
 setup(
     name='plantpredict',
-    version=version,
+    version='1.0.9',
     description='Python SDK for PlantPredict (https://ui.plantpredict.terabase.energy).',
     url='https://github.com/plantpredict/python-sdk',
     author='Stephen Kaplan, Performance & Prediction Engineer at First Solar, Inc.',
