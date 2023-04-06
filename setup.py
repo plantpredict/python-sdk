@@ -4,7 +4,7 @@ from setuptools import setup
 __currdir__ = os.getcwd()
 __readme__ = os.path.join(__currdir__, 'README.md')
 
-version = '1.0.10'
+version = '1.0.11'
 
 if __name__ == '__main__':
     setup(
