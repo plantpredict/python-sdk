@@ -20,6 +20,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('../'))
+from setup import version
 
 
 # -- General configuration ------------------------------------------------
@@ -58,14 +59,12 @@ master_doc = 'index'
 # General information about the project.
 project = u'plantpredict-python'
 copyright = u'2021, Terabase Energy'
-author = u'Stephen Kaplan, Jesse Milam'
+author = u'Kurt Rhee, Jesse Milam'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
-#
-# The short X.Y version.
-version = u'1.0.9'
+
 # The full version, including alpha/beta/rc tags.
 release = version
 
