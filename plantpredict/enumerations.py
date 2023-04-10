@@ -181,6 +181,10 @@ class PredictionVersionEnum(object):
     VERSION_5 = 5
     VERSION_6 = 6
     VERSION_7 = 7
+    VERSION_8 = 8
+    VERSION_9 = 9
+    VERSION_10 = 10
+    VERSION_11 = 11
 
 
 class ProcessingStatusEnum(object):
@@ -240,6 +244,11 @@ class TranspositionModelEnum(object):
     HAY = 0
     PEREZ = 1
 
+class CircumsolarTreatmentTypeEnum(object):
+    "Circumsolar Allocation Type"
+    DIFFUSE = 0
+    DIRECT = 1
+
 
 class WeatherDataProviderEnum(object):
     """Weather Data Provider"""
@@ -263,6 +272,9 @@ class WeatherDataProviderEnum(object):
     WHITE_BOX_TECHNOLOGIES = 18
     SOLARGIS = 19
     NASA = 20
+    THREE_TIER_VAISALA=21
+    SOLCAST=22
+
 
 
 class WeatherDataTypeEnum(object):
@@ -295,6 +307,7 @@ class WeatherFileColumnTypeEnum(object):
     WIND_DIRECTION = 11
     SOILING_LOSS = 12
     POAI = 13
+    REAR_POAI = 14
 
 
 class WeatherPLevelEnum(object):
