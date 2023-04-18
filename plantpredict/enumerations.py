@@ -153,6 +153,7 @@ class ModuleTemperatureModelEnum(object):
     """Module Temperature Model"""
     HEAT_BALANCE = 0
     SANDIA = 1
+    NOCT = 2
 
 
 class ModuleTypeEnum(object):
