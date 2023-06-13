@@ -1,7 +1,8 @@
 import json
 import requests
+
 from plantpredict.utilities import convert_json, camel_to_snake, decorate_all_methods
-from plantpredict.error_handlers import handle_refused_connection, handle_error_response
+from plantpredict.error_handlers import handle_refused_connection, handle_error_response, APIError
 
 
 @decorate_all_methods(handle_refused_connection)
@@ -26,6 +27,9 @@ class ASHRAE(object):
             headers={"Authorization": "Bearer " + self.api.access_token},
             params={"latitude": self.latitude, "longitude": self.longitude, "stationName": self.station_name}
         )
+        if not response.status_code == 200:
+            raise APIError(response.status_code, response.content)
+
         attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
             setattr(self, key, attr[key])
@@ -44,6 +48,9 @@ class ASHRAE(object):
             headers={"Authorization": "Bearer " + self.api.access_token},
             params={"latitude": self.latitude, "longitude": self.longitude}
         )
+        if not response.status_code == 200:
+            raise APIError(response.status_code, response.content)
+
         attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
             setattr(self, key, attr[key])

@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 from plantpredict.plant_predict_entity import PlantPredictEntity
-from plantpredict.error_handlers import handle_refused_connection, handle_error_response
+from plantpredict.error_handlers import handle_refused_connection, handle_error_response, APIError
 from plantpredict.enumerations import ModuleOrientationEnum, TrackingTypeEnum, FacialityEnum
 
 
@@ -626,6 +626,8 @@ class PowerPlant(PlantPredictEntity):
             temperature=ashrae.cool_996,
             use_cooling_temp=self.use_cooling_temp
         )
+        if not response.status_code == 200:
+            raise APIError(response.status_code, response.content)
 
         return response['kva']
 
