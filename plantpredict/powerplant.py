@@ -627,7 +627,7 @@ class PowerPlant(PlantPredictEntity):
             use_cooling_temp=self.use_cooling_temp
         )
         if not response.status_code == 200:
-            raise APIError(response.status_code, response.content)
+            raise APIError(response.status_code, response.content, response.url)
 
         return response['kva']
 
