@@ -28,7 +28,7 @@ class ASHRAE(object):
             params={"latitude": self.latitude, "longitude": self.longitude, "stationName": self.station_name}
         )
         if not response.status_code == 200:
-            raise APIError(response.status_code, response.content)
+            raise APIError(response.status_code, response.content, response.url)
 
         attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
@@ -49,7 +49,7 @@ class ASHRAE(object):
             params={"latitude": self.latitude, "longitude": self.longitude}
         )
         if not response.status_code == 200:
-            raise APIError(response.status_code, response.content)
+            raise APIError(response.status_code, response.content, response.url)
 
         attr = convert_json(response.json(), camel_to_snake)
         for key in attr:

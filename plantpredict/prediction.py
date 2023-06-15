@@ -210,7 +210,7 @@ class Prediction(PlantPredictEntity):
             headers={"Authorization": "Bearer " + self.api.access_token}
         )
         if not response.status_code == 200:
-            raise APIError(response.status_code, response.content)
+            raise APIError(response.status_code, response.content, response.url)
 
         return response
 
@@ -224,7 +224,7 @@ class Prediction(PlantPredictEntity):
             headers={"Authorization": "Bearer " + self.api.access_token}
         )
         if not response.status_code == 200:
-            raise APIError(response.status_code, response.content)
+            raise APIError(response.status_code, response.content, response.url)
         return response
 
     @handle_refused_connection
@@ -238,7 +238,7 @@ class Prediction(PlantPredictEntity):
             params=convert_json(params, snake_to_camel) if params else {}
         )
         if not response.status_code == 200:
-            raise APIError(response.status_code, response.content)
+            raise APIError(response.status_code, response.content, response.url)
         return response
 
     @handle_refused_connection

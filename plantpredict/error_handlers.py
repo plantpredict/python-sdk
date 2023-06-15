@@ -31,7 +31,7 @@ def handle_error_response(function):
 
             # if there is a sever side error, return the error message
             elif not 200 <= response.status_code < 300:
-                raise APIError(response.status_code, response.content)
+                raise APIError(response.status_code, response.content, response.url)
 
             # if the HTTP request receives a successful response
             else:
@@ -62,12 +62,14 @@ def handle_error_response(function):
 
 class APIError(Exception):
 
-    def __init__(self, status, errors):
+    def __init__(self, status, errors, url):
         self.status = status
         self.errors = errors
+        self.url = url
 
     def __str__(self):
-        return "HTTP Status Code {}: {}".format(
+        return "HTTP Status Code {}: {} at URL {}".format(
             self.status,
-            self.errors
+            self.errors,
+            self.url
         )

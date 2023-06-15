@@ -39,7 +39,7 @@ class PlantPredictEntity(object):
             headers={"Authorization": "Bearer " + self.api.access_token}
         )
         if response.status_code == 404:
-            raise APIError(response.status_code, response.content)
+            raise APIError(response.status_code, response.content, response.url)
         else:
             attr = convert_json(response.json(), camel_to_snake)
         for key in attr:
