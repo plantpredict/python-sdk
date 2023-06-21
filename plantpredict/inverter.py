@@ -1,7 +1,7 @@
 import requests
 
 from plantpredict.plant_predict_entity import PlantPredictEntity
-from plantpredict.error_handlers import handle_refused_connection, handle_error_response
+from plantpredict.error_handlers import handle_refused_connection, handle_error_response, APIError
 from plantpredict.enumerations import EntityTypeEnum
 
 
@@ -61,11 +61,16 @@ class Inverter(PlantPredictEntity):
                                       at 99.6 degrees).
         :return: # TODO after new API response is implemented
         """
-        return requests.get(
+        response = requests.get(
             url=self.api.base_url + "/Inverter/{}/kVa".format(self.id),
             headers={"Authorization": "Bearer " + self.api.access_token},
             params={"elevation": elevation, "temperature": temperature, "useCoolingTemp": use_cooling_temp}
         )
+        
+        if not response.status_code == 200:
+            raise APIError(response.status_code, response.content, response.url)
+        
+        return response;
 
     @handle_refused_connection
     @handle_error_response

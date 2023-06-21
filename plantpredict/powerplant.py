@@ -626,9 +626,6 @@ class PowerPlant(PlantPredictEntity):
             temperature=ashrae.cool_996,
             use_cooling_temp=self.use_cooling_temp
         )
-        if not response.status_code == 200:
-            raise APIError(response.status_code, response.content, response.url)
-
         return response['kva']
 
     @staticmethod
