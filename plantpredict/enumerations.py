@@ -162,6 +162,22 @@ class ModuleTypeEnum(object):
     ADVANCED_DIODE = 1
 
 
+class PerezModelCoefficientsEnum(object):
+    """Perez Coefficients"""
+    PLANT_PREDICT = 0
+    ALL_SITES_COMPOSITE_1990 = 1
+    ALL_SITES_COMPOSITE_1988 = 2
+    SANDIA_COMPOSITE_1988 = 3
+    USA_COMPOSITE_1988 = 4
+    FRANCE_1988 = 5
+    PHOENIX_1988 = 6
+    ELMONTE_1988 = 7
+    OSAGE_1988 = 8
+    ALBUQUERQUE_1988 = 9
+    CAPE_CANAVERAL_1988 = 10
+    ALBANY_1988 = 11
+
+
 class PredictionStatusEnum(object):
     """Prediction Status"""
     DRAFT_PRIVATE = 1
