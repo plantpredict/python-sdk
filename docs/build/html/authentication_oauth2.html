@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="python" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Authentication &mdash; plantpredict-python 1.0.17 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f0215982"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SDK Reference" href="sdk_reference.html" />
+    <link rel="prev" title="Installation &amp; Setup" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            plantpredict-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#step-1-generate-receive-client-credentials">Step 1: Generate/receive client credentials.</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#i-have-never-used-plantpredict-and-need-an-account">&quot;I have never used PlantPredict and need an account&quot;.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-have-a-plantpredict-account-and-am-the-company-administrator">&quot;I have a PlantPredict account and am the company administrator.&quot;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-have-a-plantpredict-account-but-am-not-the-company-administrator">&quot;I have a PlantPredict account but am not the company administrator.&quot;</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#step-2-store-your-api-credentials-securely">Step 2: Store your API credentials securely.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-3-authenticate-and-receive-a-token">Step 3: Authenticate and receive a token.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sdk_reference.html">SDK Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_usage.html">Example Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">plantpredict-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Authentication</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/authentication_oauth2.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-authentication">
+<span id="authentication-oauth2"></span><h1>API Authentication<a class="headerlink" href="#api-authentication" title="Link to this heading"></a></h1>
+<p>PlantPredict uses the <a class="reference external" href="https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html">Amazon Cognito &amp; OAuth 2.0 API</a>
+for administering and managing access tokens. If you are a first time user of the PlantPredict API, you need a set of
+client credentials (client ID, and client secret).</p>
+<section id="step-1-generate-receive-client-credentials">
+<h2>Step 1: Generate/receive client credentials.<a class="headerlink" href="#step-1-generate-receive-client-credentials" title="Link to this heading"></a></h2>
+<section id="i-have-never-used-plantpredict-and-need-an-account">
+<h3>&quot;I have never used PlantPredict and need an account&quot;.<a class="headerlink" href="#i-have-never-used-plantpredict-and-need-an-account" title="Link to this heading"></a></h3>
+<p>Simply navigate to <a class="reference external" href="https://ui.plantpredict.com/signUp">https://ui.plantpredict.com/signUp</a>, provide the necessary information and complete your account registration.</p>
+</section>
+<section id="i-have-a-plantpredict-account-and-am-the-company-administrator">
+<h3>&quot;I have a PlantPredict account and am the company administrator.&quot;<a class="headerlink" href="#i-have-a-plantpredict-account-and-am-the-company-administrator" title="Link to this heading"></a></h3>
+<p>If you are the only person with a PlantPredict account in your organization/company, or the first person to have an
+account, you are likely the company admin. If you are a company admin, you will have a gear icon next to your
+name on the very bottom-left of the page when you log in on a web browser.</p>
+<img alt="_images/company_admin_gear.png" class="align-center" src="_images/company_admin_gear.png" />
+<p>Click the gear icon. On the next page, search for the name of the person you would like to generate client credentials
+for, and click on their name.</p>
+<img alt="_images/search_for_name.png" class="align-center" src="_images/search_for_name.png" />
+<p>Click on &quot;Generate API Credentials&quot; on the top right of the next page.</p>
+<img alt="_images/generate_api_credentials_button.png" class="align-center" src="_images/generate_api_credentials_button.png" />
+<p>Copy each credential to your clipboard to be stored securely (step 2).</p>
+<a class="reference internal image-reference" href="_images/client_credentials.png"><img alt="_images/client_credentials.png" class="align-center" src="_images/client_credentials.png" style="width: 439.5px; height: 451.5px;" /></a>
+</section>
+<section id="i-have-a-plantpredict-account-but-am-not-the-company-administrator">
+<h3>&quot;I have a PlantPredict account but am not the company administrator.&quot;<a class="headerlink" href="#i-have-a-plantpredict-account-but-am-not-the-company-administrator" title="Link to this heading"></a></h3>
+<p>Contact the person in your organization who is the company admin, and provide to them a link to this page.</p>
+</section>
+</section>
+<section id="step-2-store-your-api-credentials-securely">
+<h2>Step 2: Store your API credentials securely.<a class="headerlink" href="#step-2-store-your-api-credentials-securely" title="Link to this heading"></a></h2>
+</section>
+<section id="step-3-authenticate-and-receive-a-token">
+<h2>Step 3: Authenticate and receive a token.<a class="headerlink" href="#step-3-authenticate-and-receive-a-token" title="Link to this heading"></a></h2>
+<p>At the beginning of any script/Python session, execute the following code to authenticate with the PlantPredict servers
+to generate an access token, which is stored on an <a class="reference internal" href="sdk_reference.html#plantpredict.api.Api" title="plantpredict.api.Api"><code class="xref py py-class docutils literal notranslate"><span class="pre">Api</span></code></a> object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">plantpredict</span>
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">plantpredict</span><span class="o">.</span><span class="n">Api</span><span class="p">(</span>
+    <span class="n">client_id</span><span class="o">=</span><span class="s2">&quot;INSERT CLIENT_ID FROM API CREDENTIALS&quot;</span><span class="p">,</span>
+    <span class="n">client_secret</span><span class="o">=</span><span class="s2">&quot;INSERT CLIENT_SECRET FROM API CREDENTIALS&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="sdk_reference.html#plantpredict.api.Api" title="plantpredict.api.Api"><code class="xref py py-class docutils literal notranslate"><span class="pre">Api</span></code></a> object is then used to instantiate other PlantPredict entities (see
+<a class="reference internal" href="example_usage.html#example-usage"><span class="std std-ref">Example Usage</span></a>).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The access token will expire after 1 hour. If your script requires more than one hour to complete, the SDK will
+automatically generate a new token using a refresh token.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation &amp; Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sdk_reference.html" class="btn btn-neutral float-right" title="SDK Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Terabase Energy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ <script type="text/javascript">
+    $(document).ready(function() {
+        $(".toggle > *").hide();
+        $(".toggle .header").show();
+        $(".toggle .header").click(function() {
+            $(this).parent().children().not(".header").toggle(400);
+            $(this).parent().children(".header").toggleClass("open");
+        })
+    });
+</script>
+
+
+</body>
+</html>
