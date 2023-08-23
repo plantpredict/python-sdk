@@ -33,3 +33,8 @@ sphinx:
 python:
    install:
    - requirements: requirements.txt
+
+python:
+   install:
+   - requirements: plantpredict
+   - method: pip
