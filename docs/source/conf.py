@@ -43,7 +43,6 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'sphinx_rtd_theme',
-    'plantpredict'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
