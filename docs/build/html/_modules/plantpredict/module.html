@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="python" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plantpredict.module &mdash; plantpredict-python 1.0.17 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f0215982"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            plantpredict-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authentication_oauth2.html">API Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sdk_reference.html">SDK Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_usage.html">Example Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">plantpredict-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plantpredict.module</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plantpredict.module</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">groupby</span>
+
+<span class="kn">from</span> <span class="nn">plantpredict.plant_predict_entity</span> <span class="kn">import</span> <span class="n">PlantPredictEntity</span>
+<span class="kn">from</span> <span class="nn">plantpredict.utilities</span> <span class="kn">import</span> <span class="n">convert_json</span><span class="p">,</span> <span class="n">camel_to_snake</span><span class="p">,</span> <span class="n">snake_to_camel</span>
+<span class="kn">from</span> <span class="nn">plantpredict.error_handlers</span> <span class="kn">import</span> <span class="n">handle_refused_connection</span><span class="p">,</span> <span class="n">handle_error_response</span>
+
+
+<div class="viewcode-block" id="Module">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.module.Module">[docs]</a>
+<span class="k">class</span> <span class="nc">Module</span><span class="p">(</span><span class="n">PlantPredictEntity</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:mod:`Module` entity models all of the characteristics of a photovoltaic solar module (panel).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Module.create">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.module.Module.create">[docs]</a>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Module*</span>
+
+<span class="sd">        Creates a new :py:mod:`plantpredict.Module` entity in the PlantPredict database using the attributes assigned to</span>
+<span class="sd">        the local object instance. Automatically assigns the resulting :py:attr:`id` to the local object instance.</span>
+<span class="sd">        See the minimum required attributes (below) necessary to successfully create a new</span>
+<span class="sd">        :py:mod:`plantpredict.Module`. Note that the full scope of attributes is not limited to the minimum required set.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes for successful Module creation</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    name; str; Name of module file</span>
+<span class="sd">                    model; str; Model number/name of module (can be the same as :py:attr:`name`)</span>
+<span class="sd">                    manufacturer; str; Module manufacturer</span>
+<span class="sd">                    length; float; Long side of the module. Must be between :py:data:`0.0` and :py:data:`10000.0` - units :py:data:`[mm]`.</span>
+<span class="sd">                    width; float; Short side of the module. Must be between :py:data:`0.0` and :py:data:`10000.0` - units :py:data:`[mm]`.</span>
+<span class="sd">                    cell_technology_type; int; Represents the cell technology type (CdTe, poly c-Si PERC, etc). Use :py:mod:`plantpredict.enumerations.CellTechnologyTypeEnum`.</span>
+<span class="sd">                    pv_model; int; Represents the 1-diode model type (1-Diode, 1-Diode with recombination). Use :py:mod:`plantpredict.enumerations.PVModelTypeEnum`.</span>
+<span class="sd">                    construction_type; int; Represents the module construction (Glass-Glass, Glass-Backsheet). Use :py:mod:`plantpredict.enumerations.ConstructionTypeEnum`.</span>
+<span class="sd">                    stc_short_circuit_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_open_circuit_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_mpp_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_mpp_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_power_temp_coef; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    stc_short_circuit_current_temp_coef; float; Must be between :py:data:`-0.3` and :py:data:`2.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    stc_open_circuit_voltage_temp_coef; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    saturation_current_at_stc; float; Must be between :py:data:`1e-13` and :py:data:`1e-6` - units :py:data:`[A]`.</span>
+<span class="sd">                    diode_ideality_factor_at_stc; float; Must be between :py:data:`0.1` and :py:data:`5.0` - unitless.</span>
+<span class="sd">                    linear_temp_dependence_on_gamma; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    exponential_dependency_on_shunt_resistance; float; Must be between :py:data:`1.0` and :py:data:`100.0` - unitless.</span>
+<span class="sd">                    series_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100.0` - units :py:data:`[Ohms]`</span>
+<span class="sd">                    dark_shunt_resistance; float; Must be between :py:data:`100.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    shunt_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    bandgap_voltage; float; Must be between :py:data:`0.5` and :py:data:`4.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    heat_absorption_coef_alpha_t; float; Must be between :py:data:`0.1` and :py:data:`1.0`.</span>
+<span class="sd">                    reference_irradiance; float; Must be between :py:data:`400.0` and :py:data:`1361.0` - units :py:data:`[W/m^2]`.</span>
+<span class="sd">                    built_in_voltage; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`3.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    recombination_parameter; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`30.0` - units :py:data:`[V]`</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                First, import the plantpredict library and create an instance of :py:mod:`plantpredict.api.Api` in your</span>
+<span class="sd">                Python session, to authenticate as shown in Step 3 of :ref:`authentication_oauth2`. Then instantiate a</span>
+<span class="sd">                local :py:mod:`plantpredict.module.Module` object.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_create = plantpredict.Module()</span>
+
+<span class="sd">                Populate the Module&#39;s require attributes by either directly assigning them...</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    from plantpredict.enumerations import CellTechnologyTypeEnum, PVModelTypeEnum, ConstructionTypeEnum</span>
+
+<span class="sd">                    module_to_create.name = &quot;Test Module&quot;</span>
+<span class="sd">                    module_to_create.model = &quot;Test Module&quot;</span>
+<span class="sd">                    module_to_create.manufacturer = &quot;Solar Company&quot;</span>
+<span class="sd">                    module_to_create.length = 2009</span>
+<span class="sd">                    module_to_create.width = 1232</span>
+<span class="sd">                    module_to_create.cell_technology_type = CellTechnologyTypeEnum.CDTE</span>
+<span class="sd">                    module_to_create.pv_model = PVModelTypeEnum.ONE_DIODE_RECOMBINATION</span>
+<span class="sd">                    module_to_create.construction_type = ConstructionTypeEnum.GLASS_GLASS</span>
+<span class="sd">                    module_to_create.stc_short_circuit_current = 2.54</span>
+<span class="sd">                    module_to_create.stc_open_circuit_voltage = 219.2</span>
+<span class="sd">                    module_to_create.stc_mpp_current = 2.355</span>
+<span class="sd">                    module_to_create.stc_mpp_voltage = 182.55</span>
+<span class="sd">                    module_to_create.stc_power_temp_coef = -0.32</span>
+<span class="sd">                    module_to_create.stc_short_circuit_current_temp_coef = 0.04</span>
+<span class="sd">                    module_to_create.stc_open_circuit_voltage_temp_coef = -0.28</span>
+<span class="sd">                    module_to_create.saturation_current_at_stc = 2.415081e-12</span>
+<span class="sd">                    module_to_create.diode_ideality_factor_at_stc = 1.17</span>
+<span class="sd">                    module_to_create.linear_temp_dependence_on_gamma = -0.08</span>
+<span class="sd">                    module_to_create.exponential_dependency_on_shunt_resistance = 5.5</span>
+<span class="sd">                    module_to_create.series_resistance_at_stc = 5.277</span>
+<span class="sd">                    module_to_create.dark_shunt_resistance = 6400</span>
+<span class="sd">                    module_to_create.shunt_resistance_at_stc = 6400</span>
+<span class="sd">                    module_to_create.bandgap_voltage = 1.5</span>
+<span class="sd">                    module_to_create.heat_absorption_coef_alpha_t = 0.9</span>
+<span class="sd">                    module_to_create.reference_irradiance = 1000</span>
+
+<span class="sd">                    # required for modules with recombination</span>
+<span class="sd">                    module_to_create.built_in_voltage = 0.9</span>
+<span class="sd">                    module_to_create.recombination_parameter = 0.9</span>
+
+<span class="sd">                ...OR via dictionary assignment.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_create.__dict__ = {</span>
+<span class="sd">                        &quot;name&quot;: &quot;Test Module&quot;,</span>
+<span class="sd">                        &quot;model&quot;: &quot;Test Module&quot;,</span>
+<span class="sd">                        &quot;manufacturer&quot;: &quot;Solar Company&quot;,</span>
+<span class="sd">                        &quot;length&quot;: 2009,</span>
+<span class="sd">                        &quot;width&quot;: 1232,</span>
+<span class="sd">                        &quot;cell_technology_type&quot;: CellTechnologyTypeEnum.CDTE,</span>
+<span class="sd">                        &quot;pv_model&quot;: PVModelTypeEnum.ONE_DIODE_RECOMBINATION,</span>
+<span class="sd">                        &quot;construction_type&quot;: ConstructionTypeEnum.GLASS_GLASS,</span>
+<span class="sd">                        &quot;stc_short_circuit_current&quot;: 2.54,</span>
+<span class="sd">                        &quot;stc_open_circuit_voltage&quot;: 219.2,</span>
+<span class="sd">                        &quot;stc_mpp_current&quot;: 2.355,</span>
+<span class="sd">                        &quot;stc_mpp_voltage&quot;: 182.55,</span>
+<span class="sd">                        &quot;stc_power_temp_coef&quot;: -0.32,</span>
+<span class="sd">                        &quot;stc_short_circuit_current_temp_coef&quot;: 0.04,</span>
+<span class="sd">                        &quot;stc_open_circuit_voltage_temp_coef&quot;: -0.28,</span>
+<span class="sd">                        &quot;saturation_current_at_stc&quot;: 2.415081e-12,</span>
+<span class="sd">                        &quot;diode_ideality_factor_at_stc&quot;: 1.17,</span>
+<span class="sd">                        &quot;linear_temp_dependence_on_gamma&quot;: -0.08,</span>
+<span class="sd">                        &quot;exponential_dependency_on_shunt_resistance&quot;: 5.5,</span>
+<span class="sd">                        &quot;dark_shunt_resistance&quot;: 6400,</span>
+<span class="sd">                        &quot;shunt_resistance_at_stc&quot;: 6400,</span>
+<span class="sd">                        &quot;bandgap_voltage&quot;: 1.5,</span>
+<span class="sd">                        &quot;heat_absorption_coef_alpha_t&quot;: 0.9,</span>
+<span class="sd">                        &quot;reference_irradiance&quot;: 1000,</span>
+<span class="sd">                        &quot;built_in_voltage&quot;: 0.9,</span>
+<span class="sd">                        &quot;recombination_parameter&quot;: 0.9</span>
+<span class="sd">                    }</span>
+
+<span class="sd">                Create a new module in the PlantPredict database, and observe that the Module now has a unique database</span>
+<span class="sd">                identifier.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_create.create()</span>
+
+<span class="sd">                    print(module_to_create.id)</span>
+
+<span class="sd">        :return: A dictionary containing the module id.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Module&quot;</span>
+
+        <span class="c1"># PlantPredict API requires 2 different fields for short circuit current to successfully create a Module.</span>
+        <span class="c1"># this line of code streamlines Module creation by only requiring the user to define</span>
+        <span class="c1"># &quot;stc_short_circuit_current&quot; (2018-09-21; things may have changed since then)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">short_circuit_current_at_stc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stc_short_circuit_current</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear_temp_dependence_on_isc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stc_short_circuit_current_temp_coef</span>
+
+        <span class="c1"># if values that are simply calculated from required parameters are not specified, calculate them</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;area&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mf">1000.0</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mf">1000.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;stc_efficiency&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">stc_efficiency</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stc_efficiency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stc_max_power</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">*</span> <span class="mf">1000.0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Module</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Module.delete">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.module.Module.delete">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **DELETE** */Module/* :py:attr:`id`</span>
+
+<span class="sd">        Deletes an existing :py:mod:`plantpredict.Module` entity in the PlantPredict database according to the</span>
+<span class="sd">        :py:attr:`id` of the local object instance.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                First, import the plantpredict library and create an instance of :py:mod:`plantpredict.api.Api` in your</span>
+<span class="sd">                Python session, to authenticate as shown in Step 3 of :ref:`authentication_oauth2`. Then instantiate a</span>
+<span class="sd">                local :py:mod:`plantpredict.module.Module` object with the :py:attr:`id` of the target Module in the</span>
+<span class="sd">                PlantPredict database.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_delete = plantpredict.Module(id=99999)</span>
+
+<span class="sd">                Delete the Module.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_delete.delete()</span>
+
+<span class="sd">        :return: A dictionary {&quot;is_successful&quot;: True}.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Module/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Module</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Module.get">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.module.Module.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **GET** */Module/* :py:attr:`id`</span>
+
+<span class="sd">        Retrieves an existing :py:mod:`plantpredict.Module` entity from the PlantPredict database according to the</span>
+<span class="sd">        :py:attr:`id` of the local object instance, and automatically assigns all of its attributes to the local object</span>
+<span class="sd">        instance.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                First, import the plantpredict library and create an instance of :py:mod:`plantpredict.api.Api` in your</span>
+<span class="sd">                Python session, to authenticate as shown in Step 3 of :ref:`authentication_oauth2`. Then instantiate a</span>
+<span class="sd">                local :py:mod:`plantpredict.module.Module` object with the :py:attr:`id` of the target module in the</span>
+<span class="sd">                PlantPredict database.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_get = plantpredict.Module(id=99999)</span>
+
+<span class="sd">                Retrieve the Module from the PlantPredict database.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_get.get()</span>
+
+<span class="sd">                This will automatically assign all of that Module&#39;s attributes to the local object instance. All of the</span>
+<span class="sd">                attributes are now readily accessible in the local Python session.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_name = module_to_get.name</span>
+<span class="sd">                    Isc = module_to_get.stc_short_circuit_current</span>
+
+<span class="sd">        :return: A dictionary containing all of the retrieved Module attributes. (Matches the result of calling</span>
+<span class="sd">                 `self.__dict__` after calling this method).</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Module/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Module</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Module.update">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.module.Module.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **PUT** */Module*</span>
+
+<span class="sd">        Updates an existing :py:mod:`plantpredict.Module` entity in PlantPredict using the full attributes of the local</span>
+<span class="sd">        object instance. Calling this method is most commonly preceded by instantiating a local instance of</span>
+<span class="sd">        :py:mod:`plantpredict.Module` with a specified :py:attr:`id`, calling :py:meth:`plantpredict.Module.get()`,</span>
+<span class="sd">        and changing any attributes locally.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                First, import the plantpredict library and create an instance of :py:mod:`plantpredict.api.Api` in your</span>
+<span class="sd">                Python session, to authenticate as shown in Step 3 of :ref:`authentication_oauth2`. Then instantiate a</span>
+<span class="sd">                local :py:mod:`plantpredict.module.Module` object with the :py:attr:`id` of the target module in the</span>
+<span class="sd">                PlantPredict database.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_update = plantpredict.Module(id=99999)</span>
+
+<span class="sd">                Retrieve the Module from the PlantPredict database.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_update.get()</span>
+
+<span class="sd">                This will automatically assign all of that Module&#39;s attributes to the local object instance. Any/all</span>
+<span class="sd">                of the attributes can now be modified locally.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module.name = &quot;New Name&quot;</span>
+<span class="sd">                    module.shunt_resistance_at_stc = 8000</span>
+
+<span class="sd">                Persist (update) the local changes to the PlantPredict database.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module.update()</span>
+
+<span class="sd">        :return: A dictionary {&quot;is_successful&quot;: True}.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Module&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Module</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">get_module_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: a list of all modules to which a user has access.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Module&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+           <span class="p">)</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">generate_single_diode_parameters_default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Module/Generator/GenerateSingleDiodeParametersDefault*</span>
+
+<span class="sd">        Generates single-diode parameters from module electrical characteristics available on any standard</span>
+<span class="sd">        manufacturers&#39; module datasheet. Detailed documentation on the algorithm and assumptions can be found</span>
+<span class="sd">        `here &lt;https://plantpredict.com/algorithm/module-file-generator/#756-2&gt;`_. (Note: The values in the table</span>
+<span class="sd">        titled &quot;Defaulted Inputs&quot; are used in the algorithm and returned in the response of this method). An example of</span>
+<span class="sd">        using this method in practice can be found in :ref:`example_usage`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    cell_technology_type; int; Represents the cell technology type (CdTe, poly c-Si PERC, etc). Use :py:mod:`plantpredict.enumerations.CellTechnologyTypeEnum`.</span>
+<span class="sd">                    pv_model; int; Represents the 1-diode model type (1-Diode, 1-Diode with recombination). Use :py:mod:`plantpredict.enumerations.PVModelTypeEnum`.</span>
+<span class="sd">                    number_of_cells_in_series; int; Number of cells in one string of cells - unitless</span>
+<span class="sd">                    reference_irradiance; float; Must be between :py:data:`400.0` and :py:data:`1361.0` - units :py:data:`[W/m^2]`. However, the calculation is always made at :py:data:`1000 W/m^2`.</span>
+<span class="sd">                    reference_temperature; float; Must be between :py:data:`-20.0` and :py:data:`80.0` - units :py:data:`[deg-C]`. However, the calculation is always made at :py:data:`25 deg-C`.</span>
+<span class="sd">                    stc_max_power; float; Must be between :py:data:`0.0` and :py:data:`1000.0` - units :py:data:`[W]`.</span>
+<span class="sd">                    stc_short_circuit_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_open_circuit_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_mpp_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_mpp_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_power_temp_coef; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    stc_short_circuit_current_temp_coef; float; Must be between :py:data:`-0.3` and :py:data:`2.0` - units :py:data:`[%/deg-C]`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Generated Parameters**</span>
+
+<span class="sd">            .. container:: generated_parameters</span>
+
+<span class="sd">                .. csv-table:: Generated Parameters</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    series_resistance_at_stc; float; units :py:data:`[Ohms]`</span>
+<span class="sd">                    maximum_series_resistance; float; units :py:data:`[Ohms]`</span>
+<span class="sd">                    recombination_parameter; float; units :py:data:`[V]`</span>
+<span class="sd">                    maximum_recombination_parameter; float; units :py:data:`[V]`</span>
+<span class="sd">                    shunt_resistance_at_stc; float; units :py:data:`[Ohms]`</span>
+<span class="sd">                    exponential_dependency_on_shunt_resistance; float; Defaulted to 5.5 - unitless</span>
+<span class="sd">                    dark_shunt_resistance; float; units :py:data:`[Ohms]`</span>
+<span class="sd">                    saturation_current_at_stc; float; units :py:data:`[A]`</span>
+<span class="sd">                    diode_ideality_factor_at_stc; float; unitless</span>
+<span class="sd">                    linear_temp_dependence_on_gamma; float; units :py:data:`[%/deg-C]`</span>
+<span class="sd">                    light_generated_current; float; units :py:data:`[A]`</span>
+
+<span class="sd">        :return: Dictionary mirroring local module object with newly generated parameters.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Module/Generator/GenerateSingleDiodeParametersDefault&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">convert_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">convert_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">camel_to_snake</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">generate_single_diode_parameters_advanced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Module/Generator/GenerateSingleDiodeParametersAdvanced*</span>
+
+<span class="sd">        Solves for unknown single-diode parameters from module electrical characteristics and known single-diode</span>
+<span class="sd">        parameters. This method is considered &quot;advanced&quot; because it requires more inputs to generate the remaining</span>
+<span class="sd">        single-diode parameters. Whereas, the &quot;default&quot; method</span>
+<span class="sd">        :py:meth:`plantpredict.Module.generate_single_diode_parameters_default` is relatively basic in that it requires</span>
+<span class="sd">        less inputs and automatically calculates more of the parameters. An example of using this method in practice</span>
+<span class="sd">        can be found in :ref:`example_usage`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    cell_technology_type; int; Represents the cell technology type (CdTe, poly c-Si PERC, etc). Use :py:mod:`plantpredict.enumerations.CellTechnologyTypeEnum`.</span>
+<span class="sd">                    pv_model; int; Represents the 1-diode model type (1-Diode, 1-Diode with recombination). Use :py:mod:`plantpredict.enumerations.PVModelTypeEnum`.</span>
+<span class="sd">                    number_of_cells_in_series; int; Number of cells in one string of cells - unitless</span>
+<span class="sd">                    reference_irradiance; float; Must be between :py:data:`400.0` and :py:data:`1361.0` - units :py:data:`[W/m^2]`. However, the calculation is always made at :py:data:`1000 W/m^2`.</span>
+<span class="sd">                    reference_temperature; float; Must be between :py:data:`-20.0` and :py:data:`80.0` - units :py:data:`[deg-C]`. However, the calculation is always made at :py:data:`25 deg-C`.</span>
+<span class="sd">                    stc_max_power; float; Must be between :py:data:`0.0` and :py:data:`1000.0` - units :py:data:`[W]`.</span>
+<span class="sd">                    stc_short_circuit_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_open_circuit_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_mpp_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_mpp_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_power_temp_coef; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    stc_short_circuit_current_temp_coef; float; Must be between :py:data:`-0.3` and :py:data:`2.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    series_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100.0` - units :py:data:`[Ohms]`</span>
+<span class="sd">                    shunt_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    dark_shunt_resistance; float; Must be between :py:data:`100.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    recombination_parameter; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`30.0`</span>
+<span class="sd">                    exponential_dependency_on_shunt_resistance; float; Must be between :py:data:`1.0` and :py:data:`100.0` - unitless.</span>
+<span class="sd">                    bandgap_voltage; float; Must be between :py:data:`0.5` and :py:data:`4.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    built_in_voltage; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`3.0` - units :py:data:`[V]`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Generated Parameters**</span>
+
+<span class="sd">            .. container:: generated_parameters</span>
+
+<span class="sd">                .. csv-table:: Generated Parameters</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    maximum_series_resistance; float; units :py:data:`[Ohms]`</span>
+<span class="sd">                    maximum_recombination_parameter; float; units :py:data:`[V]`</span>
+<span class="sd">                    saturation_current_at_stc; float; units :py:data:`[A]`</span>
+<span class="sd">                    diode_ideality_factor_at_stc; float; unitless</span>
+<span class="sd">                    linear_temp_dependence_on_gamma; float; units :py:data:`[%/deg-C]`</span>
+<span class="sd">                    light_generated_current; float; units :py:data:`[A]`</span>
+
+<span class="sd">        :return: Dictionary mirroring local module object with newly generated parameters.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Module/Generator/GenerateSingleDiodeParametersAdvanced&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">convert_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">convert_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">camel_to_snake</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">calculate_effective_irradiance_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Module/Generator/CalculateEffectiveIrradianceResponse*</span>
+
+<span class="sd">        Calculates the relative efficiency for any number of irradiance conditions with respect to performance at :py:data:`1000 W/m^2` for a given temperature. Detailed</span>
+<span class="sd">        documentation on this calculation can be found `here</span>
+<span class="sd">        &lt;https://plantpredict.com/algorithm/module-file-generator/#effective-irradiance-response-eir-calculation&gt;`_.</span>
+<span class="sd">        Unlike other of the :py:mod:`plantpredict.Module` methods related to generating module files, this method only returns</span>
+<span class="sd">        a dictionary, and does not also auto-assign any attributes to the local object.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    effective_irradiance_response; list of dict; Contains irradiance/temperature conditions at which to calculate relative efficiency. See example code below for usage.</span>
+<span class="sd">                    cell_technology_type; int; Represents the cell technology type (CdTe, poly c-Si PERC, etc). Use :py:mod:`plantpredict.enumerations.CellTechnologyTypeEnum`.</span>
+<span class="sd">                    pv_model; int; Represents the 1-diode model type (1-Diode, 1-Diode with recombination). Use :py:mod:`plantpredict.enumerations.PVModelTypeEnum`.</span>
+<span class="sd">                    number_of_cells_in_series; int; Number of cells in one string of cells - unitless</span>
+<span class="sd">                    reference_irradiance; float; Must be between :py:data:`400.0` and :py:data:`1361.0` - units :py:data:`[W/m^2]`. However, only the irradiance values provided in :py:attr:`effective_irradiance_response are used in this calculation.</span>
+<span class="sd">                    reference_temperature; float; Must be between :py:data:`-20.0` and :py:data:`80.0` - units :py:data:`[deg-C]`. However, only the temperature values provided in :py:attr:`effective_irradiance_response are used in this calculation.</span>
+<span class="sd">                    stc_max_power; float; Must be between :py:data:`0.0` and :py:data:`1000.0` - units :py:data:`[W]`.</span>
+<span class="sd">                    stc_short_circuit_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_open_circuit_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_mpp_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_mpp_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_power_temp_coef; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    stc_short_circuit_current_temp_coef; float; Must be between :py:data:`-0.3` and :py:data:`2.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    series_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100.0` - units :py:data:`[Ohms]`</span>
+<span class="sd">                    shunt_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    dark_shunt_resistance; float; Must be between :py:data:`100.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    recombination_parameter; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`30.0`</span>
+<span class="sd">                    exponential_dependency_on_shunt_resistance; float; Must be between :py:data:`1.0` and :py:data:`100.0` - unitless.</span>
+<span class="sd">                    bandgap_voltage; float; Must be between :py:data:`0.5` and :py:data:`4.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    built_in_voltage; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`3.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    saturation_current_at_stc; float; Must be between :py:data:`1e-13` and :py:data:`1e-6` - units :py:data:`[A]`.</span>
+<span class="sd">                    diode_ideality_factor_at_stc; float; Must be between :py:data:`0.1` and :py:data:`5.0` - unitless.</span>
+<span class="sd">                    linear_temp_dependence_on_gamma; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    light_generated_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                First, import the plantpredict library and create an instance of :py:mod:`plantpredict.api.Api` in your</span>
+<span class="sd">                Python session, to authenticate as shown in Step 3 of :ref:`authentication_oauth2`. Then instantiate a</span>
+<span class="sd">                local :py:mod:`plantpredict.module.Module` object as shown in previous examples. Then, assuming that all</span>
+<span class="sd">                of the other required attributes have been assigned to the local object, assign the attribute</span>
+<span class="sd">                :py:attr:`effective_irradiance_response` as follows (this determines which conditions the relative</span>
+<span class="sd">                efficiencies will be calculated at):</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module.effective_irradiance_response = [</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 1000},</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 800},</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 600},</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 400},</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 200}</span>
+<span class="sd">                    ]</span>
+
+<span class="sd">                *Important note: For each dictionary in :py:attr:`effective_irradiance_response`, there is an optional</span>
+<span class="sd">                field (in addition to py:attr:`temperature` and py:attr:`irradiance`), :py:attr:`relative_efficiency`.</span>
+<span class="sd">                For this method, that field does not have to be defined - it is used for</span>
+<span class="sd">                :py:meth:`optimize_series_resistance` to be used as a target for tuning the series resistance. The EIR</span>
+<span class="sd">                calculated by this method will be different from the target. In the context of creating a new module</span>
+<span class="sd">                file, a user would probably want to compare the model-calculated EIR (determined from this method), to</span>
+<span class="sd">                the target relative efficiencies in :py:attr:`effective_irradiance_response`, which is why they have</span>
+<span class="sd">                :py:attr:`temperature` and :py:attr:`irradiance` in common.*</span>
+
+<span class="sd">                Call this method to generate the model-calculated effective irradiance response.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module.calculate_effective_irradiance_response()</span>
+
+<span class="sd">                Which returns the following sample response (a relative efficiency of 0.99 represents 99% or -1%</span>
+<span class="sd">                efficiency relative to :py:data:`[W/m^2]` at the same temperature):</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    [</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 1000, &#39;relative_efficiency&#39;: 1.0},</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 800, &#39;relative_efficiency&#39;: 1.02},</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 600, &#39;relative_efficiency&#39;: 1.001},</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 400, &#39;relative_efficiency&#39;: 0.99},</span>
+<span class="sd">                        {&#39;temperature&#39;: 25, &#39;irradiance&#39;: 200, &#39;relative_efficiency&#39;: 0.97}</span>
+<span class="sd">                    ]</span>
+
+<span class="sd">        :return: A list of dictionaries containing the calculated relative efficiencies (see Example Code above).</span>
+<span class="sd">        :rtype: list of dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Module/Generator/CalculateEffectiveIrradianceResponse&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">convert_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">optimize_series_resistance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Module/Generator/OptimizeSeriesResistance*</span>
+
+<span class="sd">        While this method can be called independently, it is most commonly used after first calling</span>
+<span class="sd">        :py:meth:`plantpredict.Module.generate_single_diode_parameters_advanced` or</span>
+<span class="sd">        :py:meth:`plantpredict.Module.generate_single_diode_parameters_default`. Automatically &quot;tunes&quot;</span>
+<span class="sd">        :py:attr:`series_resistance_at_stc` to bring the model-calculated effective irradiance</span>
+<span class="sd">        (EIR) response close to a user-specified target EIR. Also recalculates single-diode parameters dependent on</span>
+<span class="sd">        :py:attr:`series_resistance_at_stc`. Detailed documentation on the algorithm used to accomplish this can be</span>
+<span class="sd">        found `here</span>
+<span class="sd">        &lt;https://plantpredict.com/algorithm/module-file-generator/#optimize-series-resistance-to-match-eir-algorithm&gt;`_.</span>
+<span class="sd">        An example of using this method in practice can be found in :ref:`example_usage`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    effective_irradiance_response; list of dict; List of dictionaries each containing temperature, irradiance, and the target efficiency relative to STC at those conditions.</span>
+<span class="sd">                    cell_technology_type; int; Represents the cell technology type (CdTe, poly c-Si PERC, etc). Use :py:mod:`plantpredict.enumerations.CellTechnologyTypeEnum`.</span>
+<span class="sd">                    pv_model; int; Represents the 1-diode model type (1-Diode, 1-Diode with recombination). Use :py:mod:`plantpredict.enumerations.PVModelTypeEnum`.</span>
+<span class="sd">                    number_of_cells_in_series; int; Number of cells in one string of cells - unitless</span>
+<span class="sd">                    reference_irradiance; float; Must be between :py:data:`400.0` and :py:data:`1361.0` - units :py:data:`[W/m^2]`. While required, this value isn&#39;t used in the calculation.</span>
+<span class="sd">                    reference_temperature; float; Must be between :py:data:`-20.0` and :py:data:`80.0` - units :py:data:`[deg-C]`. While required, this value isn&#39;t used in the calculation.</span>
+<span class="sd">                    stc_max_power; float; Must be between :py:data:`0.0` and :py:data:`1000.0` - units :py:data:`[W]`.</span>
+<span class="sd">                    stc_short_circuit_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_open_circuit_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_mpp_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_mpp_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_power_temp_coef; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    stc_short_circuit_current_temp_coef; float; Must be between :py:data:`-0.3` and :py:data:`2.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    series_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100.0` - units :py:data:`[Ohms]`</span>
+<span class="sd">                    shunt_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    dark_shunt_resistance; float; Must be between :py:data:`100.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    recombination_parameter; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`30.0`</span>
+<span class="sd">                    exponential_dependency_on_shunt_resistance; float; Must be between :py:data:`1.0` and :py:data:`100.0` - unitless.</span>
+<span class="sd">                    bandgap_voltage; float; Must be between :py:data:`0.5` and :py:data:`4.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    built_in_voltage; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`3.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    saturation_current_at_stc; float; Must be between :py:data:`1e-13` and :py:data:`1e-6` - units :py:data:`[A]`.</span>
+<span class="sd">                    diode_ideality_factor_at_stc; float; Must be between :py:data:`0.1` and :py:data:`5.0` - unitless.</span>
+<span class="sd">                    linear_temp_dependence_on_gamma; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    light_generated_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`</span>
+
+<span class="sd">        :return: Dictionary mirroring local module object with newly generated parameters.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Module/Generator/OptimizeSeriesResistance&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">convert_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">convert_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">camel_to_snake</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_key_iv_points_template</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses the PlantPredict standard template for Key IV Points input and returns a JSON-serializable</span>
+<span class="sd">        data structure.</span>
+
+<span class="sd">        :param file_path: Full path to .xlsx file containing Key IV points data.</span>
+<span class="sd">        :type file_path: str</span>
+<span class="sd">        :param sheet_name: Sheet name containing data (only required if using file with multiple Excel sheets).</span>
+<span class="sd">        :type sheet_name: str</span>
+<span class="sd">        :return: List of dictionaries containing data in appropriate structure for process_key_iv_points() method.</span>
+<span class="sd">        :rtype: list of dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xl</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">sheet_idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">sheet_name</span> <span class="k">else</span> <span class="n">xl</span><span class="o">.</span><span class="n">sheet_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span>
+        <span class="n">xls_data</span> <span class="o">=</span> <span class="n">xl</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xl</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">[</span><span class="n">sheet_idx</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
+
+        <span class="n">key_iv_points_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">xls_data</span><span class="p">:</span>
+            <span class="n">key_iv_points_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;Temperature [deg-C]&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;irradiance&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;Irradiance [W/m2]&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;short_circuit_current&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;Isc [A]&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;mpp_current&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;Imp [A]&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;open_circuit_voltage&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;Voc [V]&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;mpp_voltage&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;Vmp [V]&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;max_power&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;Pmp [W]&quot;</span><span class="p">],</span>
+            <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">key_iv_points_data</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">process_key_iv_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_iv_points_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Module/Generator/ProcessKeyIVPoints*</span>
+
+<span class="sd">        Processes &quot;Key IV Points&quot; data, either from a :download:`file template &lt;_static/PlantPredict_KeyIVPointsTemplate.xlsx&gt;` or</span>
+<span class="sd">        similar data structure. This is used as a pre-processing step to module file generation - it returns the minimum</span>
+<span class="sd">        required fields for :py:meth:`plantpredict.generate_single_diode_parameters_default`. It also automatically</span>
+<span class="sd">        assigns the resulting attributtes to the local object instance of :py:mod:`plantpredict.Module`. Detailed</span>
+<span class="sd">        algorithmic documentation for this method can be found `here</span>
+<span class="sd">        &lt;https://plantpredict.com/algorithm/module-file-generator/#processing-key-i-v-points&gt;`_. See &quot;Example Code&quot;</span>
+<span class="sd">        below for sample usage and &quot;Generated Parameters&quot; for the resulting attributes assigned to the local object</span>
+<span class="sd">        instance.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                If the user is using the Excel template, usage of this method is straightforward:</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module = plantpredict.Module()</span>
+<span class="sd">                    module.process_key_iv_points(file_path=&quot;path_to_key_iv_points_template.xlsx&quot;)</span>
+
+<span class="sd">                However, the user can also manually construct the data structure and call the method as follows:</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    input_data = [</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;temperature&quot;: 15,</span>
+<span class="sd">                            &quot;irradiance&quot;: 1000,</span>
+<span class="sd">                            &quot;short_circuit_current&quot;: 0.174,</span>
+<span class="sd">                            &quot;open_circuit_voltage&quot;: 83.71,</span>
+<span class="sd">                            &quot;mpp_current&quot;: 0.150,</span>
+<span class="sd">                            &quot;mpp_voltage&quot;: 70.28,</span>
+<span class="sd">                            &quot;max_power&quot;: 10.56,</span>
+<span class="sd">                        },</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;temperature&quot;: 25,</span>
+<span class="sd">                            &quot;irradiance&quot;: 1000,</span>
+<span class="sd">                            &quot;short_circuit_current&quot;: 1.749,</span>
+<span class="sd">                            &quot;open_circuit_voltage&quot;: 89.71,</span>
+<span class="sd">                            &quot;mpp_current&quot;: 1.590,</span>
+<span class="sd">                            &quot;mpp_voltage&quot;: 72.04,</span>
+<span class="sd">                            &quot;max_power&quot;: 114.52,</span>
+<span class="sd">                        },</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;temperature&quot;: 25,</span>
+<span class="sd">                            &quot;irradiance&quot;: 800,</span>
+<span class="sd">                            &quot;short_circuit_current&quot;: 1.399,</span>
+<span class="sd">                            &quot;open_circuit_voltage&quot;: 88.85,</span>
+<span class="sd">                            &quot;mpp_current&quot;: 1.272,</span>
+<span class="sd">                            &quot;mpp_voltage&quot;: 72.20,</span>
+<span class="sd">                            &quot;max_power&quot;: 91.85,</span>
+<span class="sd">                        },</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;temperature&quot;: 25,</span>
+<span class="sd">                            &quot;irradiance&quot;: 600,</span>
+<span class="sd">                            &quot;short_circuit_current&quot;: 1.049,</span>
+<span class="sd">                            &quot;open_circuit_voltage&quot;: 87.75,</span>
+<span class="sd">                            &quot;mpp_current&quot;: 0.951,</span>
+<span class="sd">                            &quot;mpp_voltage&quot;: 72.75,</span>
+<span class="sd">                            &quot;max_power&quot;: 68.68,</span>
+<span class="sd">                        },</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;temperature&quot;: 25,</span>
+<span class="sd">                            &quot;irradiance&quot;: 400,</span>
+<span class="sd">                            &quot;short_circuit_current&quot;: 0.700,</span>
+<span class="sd">                            &quot;open_circuit_voltage&quot;: 86.27,</span>
+<span class="sd">                            &quot;mpp_current&quot;: 0.630,</span>
+<span class="sd">                            &quot;mpp_voltage&quot;: 71.92,</span>
+<span class="sd">                            &quot;max_power&quot;: 45.29,</span>
+<span class="sd">                        },</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;temperature&quot;: 25,</span>
+<span class="sd">                            &quot;irradiance&quot;: 200,</span>
+<span class="sd">                            &quot;short_circuit_current&quot;: 0.350,</span>
+<span class="sd">                            &quot;open_circuit_voltage&quot;: 83.67,</span>
+<span class="sd">                            &quot;mpp_current&quot;: 0.311,</span>
+<span class="sd">                            &quot;mpp_voltage&quot;: 70.32,</span>
+<span class="sd">                            &quot;max_power&quot;: 21.88,</span>
+<span class="sd">                        },</span>
+<span class="sd">                            &quot;temperature&quot;: 50,</span>
+<span class="sd">                            &quot;irradiance&quot;: 1000,</span>
+<span class="sd">                            &quot;short_circuit_current&quot;: 1.768,</span>
+<span class="sd">                            &quot;open_circuit_voltage&quot;: 83.05,</span>
+<span class="sd">                            &quot;mpp_current&quot;: 1.599,</span>
+<span class="sd">                            &quot;mpp_voltage&quot;: 65.71,</span>
+<span class="sd">                            &quot;max_power&quot;: 105.07,</span>
+<span class="sd">                        }</span>
+<span class="sd">                    ]</span>
+
+<span class="sd">                    module.process_key_iv_points(key_iv_points_data=input_data)</span>
+
+<span class="sd">                While the only *required* temperature/irradiance conditions is STC (25 deg-C / 1000 W/m^2), more input</span>
+<span class="sd">                data is required to generate temperature coefficients and effective irradiance response (see Generated</span>
+<span class="sd">                Parameters).</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Generated Parameters**</span>
+
+<span class="sd">            .. container:: generated_parameters</span>
+
+<span class="sd">                The following parameters are automatically assigned as attributes to the local instance of :py:class:`plantpredict.Module`.</span>
+
+<span class="sd">                .. csv-table:: Generated Parameters</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    stc_short_circuit_current; float; Always returned with minimum required input (data at STC) - units :py:data:`[A]`</span>
+<span class="sd">                    stc_open_circuit_voltage; float; Always returned with minimum required input (data at STC) - units :py:data:`[V]`</span>
+<span class="sd">                    stc_mpp_current; float; Always returned with minimum required input (data at STC) - units :py:data:`[A]`</span>
+<span class="sd">                    stc_mpp_voltage; float; Always returned with minimum required input (data at STC) - units :py:data:`[V]`</span>
+<span class="sd">                    stc_max_power; float; Always returned with minimum required input (data at STC) - units :py:data:`[W]`</span>
+<span class="sd">                    stc_short_circuit_current_temp_coef; float; Only returned if data provided at :py:data:`1000 W/m^2` and at least one temperature other than :py:data:`25 deg-C` - units :py:data:`[%/deg-C]`</span>
+<span class="sd">                    stc_open_circuit_voltage_temp_coef; float; Only returned if data provided at :py:data:`1000 W/m^2` and at least one temperature other than :py:data:`25 deg-C` - units :py:data:`[%/deg-C]`</span>
+<span class="sd">                    stc_power_temp_coef; float; Only returned if data provided at :py:data:`1000 W/m^2` and at least one temperature other than :py:data:`25 deg-C` - units :py:data:`[%/deg-C]`</span>
+<span class="sd">                    effective_irradiance_response; dict; Only returned if data provided at multiple irradiances for a single temperature - see example output below for contents.</span>
+
+<span class="sd">            .. container:: generated_parameters_dict</span>
+
+<span class="sd">                The following is an example of the dictionary output (mirrors &quot;Generated Parameters&quot;).</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;stc_short_circuit_current&quot;: 1.7592,</span>
+<span class="sd">                        &quot;stc_open_circuit_voltage&quot;: 90.2189,</span>
+<span class="sd">                        &quot;stc_mpp_current&quot;: 1.6084,</span>
+<span class="sd">                        &quot;stc_mpp_voltage&quot;: 72.4938,</span>
+<span class="sd">                        &quot;stc_short_circuit_current_temp_coef&quot;: 0.0519,</span>
+<span class="sd">                        &quot;stc_open_circuit_voltage_temp_coef&quot;: -0.3081,</span>
+<span class="sd">                        &quot;stc_power_temp_coef&quot;: -0.3535,</span>
+<span class="sd">                        &quot;effective_irradiance_response&quot;: [</span>
+<span class="sd">                            {&quot;temperature&quot;: 25, &quot;irradiance&quot;: 1000, &quot;relative_efficiency&quot;: 1.0},</span>
+<span class="sd">                            {&quot;temperature&quot;: 25, &quot;irradiance&quot;: 800, &quot;relative_efficiency&quot;: 1.0039},</span>
+<span class="sd">                            {&quot;temperature&quot;: 25, &quot;irradiance&quot;: 600, &quot;relative_efficiency&quot;: 1.0032},</span>
+<span class="sd">                            {&quot;temperature&quot;: 25, &quot;irradiance&quot;: 400, &quot;relative_efficiency&quot;: 0.9925},</span>
+<span class="sd">                            {&quot;temperature&quot;: 25, &quot;irradiance&quot;: 200, &quot;relative_efficiency&quot;: 0.9582},</span>
+<span class="sd">                        ]</span>
+<span class="sd">                    }</span>
+
+<span class="sd">        :param file_path: File path to the .xlsx template for Key IV Points (input option 1).</span>
+<span class="sd">        :type file_path: str</span>
+<span class="sd">        :param key_iv_points_data: List of dictionaries containing module electrical characteristics at STC and other temperature/irradiance conditions (input option 2).</span>
+<span class="sd">        :type key_iv_points_data: lists of dict</span>
+<span class="sd">        :return: Dictionary containing STC electrical parameters, temperature coefficients, and effective irradiance response, depending on the scope of the input data provided (see &quot;Generated Parameters&quot; above).</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if the input is the .xlsx template, parse it</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">key_iv_points_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Either a file path to the .xslx template for Key IV Points input or the properly formatted &quot;</span> 
+                <span class="s2">&quot;JSON-serializable data structure for Key IV Points input must be assigned as input. See the Python &quot;</span>
+                <span class="s2">&quot;SDK documentation (https://plantpredict-python.readthedocs.io/en/latest/) for more information.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">file_path</span> <span class="ow">and</span> <span class="n">key_iv_points_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Only one input option may be specified.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># if the user specifies a file_path to the .xlsx template, parse it</span>
+        <span class="k">elif</span> <span class="n">file_path</span><span class="p">:</span>
+            <span class="n">key_iv_points_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_key_iv_points_template</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Module/Generator/ProcessKeyIVPoints&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="p">[</span><span class="n">convert_json</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">key_iv_points_data</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">convert_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">camel_to_snake</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_full_iv_curves_template</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Locally parses the PlantPredict standard template for Full IV Curves input and returns a JSON-serializable</span>
+<span class="sd">        data structure.</span>
+
+<span class="sd">        :param file_path: Full path to .xslx file containing Full IV Curve data.</span>
+<span class="sd">        :type file_path: str</span>
+<span class="sd">        :param sheet_name: Sheet name containing data (only required if using file with multiple Excel sheets).</span>
+<span class="sd">        :type sheet_name: str</span>
+<span class="sd">        :return: List of dictionaries containing data in appropriate structure for process_full_iv_curves() method.</span>
+<span class="sd">        :rtype: list of dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xl</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">sheet_idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">sheet_name</span> <span class="k">else</span> <span class="n">xl</span><span class="o">.</span><span class="n">sheet_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span>
+        <span class="n">xls_data</span> <span class="o">=</span> <span class="n">xl</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xl</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">[</span><span class="n">sheet_idx</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
+
+        <span class="n">grouper</span> <span class="o">=</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;Temperature [deg-C]&quot;</span><span class="p">,</span> <span class="s2">&quot;Irradiance [W/m2]&quot;</span><span class="p">)</span>
+        <span class="n">full_iv_curves_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">xls_data</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">grouper</span><span class="p">),</span> <span class="n">grouper</span><span class="p">):</span>
+            <span class="n">temp_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;Temperature [deg-C]&quot;</span><span class="p">,</span> <span class="s2">&quot;Irradiance [W/m2]&quot;</span><span class="p">],</span> <span class="n">key</span><span class="p">))</span>
+
+            <span class="n">iv_points</span> <span class="o">=</span> <span class="p">[(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;I [A]&quot;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;V [V]&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">grp</span><span class="p">]</span>
+            <span class="n">full_iv_curves_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">temp_dict</span><span class="p">[</span><span class="s2">&quot;Temperature [deg-C]&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;irradiance&quot;</span><span class="p">:</span> <span class="n">temp_dict</span><span class="p">[</span><span class="s2">&quot;Irradiance [W/m2]&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;data_points&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;current&quot;</span><span class="p">:</span> <span class="n">iv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;voltage&quot;</span><span class="p">:</span> <span class="n">iv</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span> <span class="k">for</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">iv_points</span><span class="p">]</span>
+            <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">full_iv_curves_data</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">process_iv_curves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">iv_curve_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Module/Generator/ProcessIVCurves*</span>
+
+<span class="sd">        Processes any number of full IV Curve measurements, either from a :download:`file template</span>
+<span class="sd">        &lt;_static/PlantPredict_FullIVCurvesTemplate.xlsx&gt;` or similar data structure. This is used as a pre-processing</span>
+<span class="sd">        step to module file generation - it returns the extracted electrical characteristics at the set of</span>
+<span class="sd">        temperature/irradiance conditions corresponding to those of the provided IV Curves. The output data structure</span>
+<span class="sd">        matches the exact data input structure for :py:meth:`plantpredict.Module.process_key_iv_points`. (The</span>
+<span class="sd">        methods are meant to be used in succession in order to effectively extract electrical characteristics at STC,</span>
+<span class="sd">        temperature coefficients, and effective irradiance response from a set of IV curves). Detailed algorithmic</span>
+<span class="sd">        documentation for this method can be found `here</span>
+<span class="sd">        &lt;https://plantpredict.com/algorithm/module-file-generator/#processing-full-i-v-curves&gt;`_. See &quot;Example Code&quot;</span>
+<span class="sd">        below for sample usage.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                If the user is using the Excel template, usage of this method is straightforward:</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module = plantpredict.Module()</span>
+<span class="sd">                    module.process_iv_curves(file_path=&quot;path_to_iv_curves_template.xlsx&quot;)</span>
+
+<span class="sd">                However, the user can also manually construct the data structure and call the method as follows:</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    input_data = [</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;temperature&quot;: 25,</span>
+<span class="sd">                            &quot;irradiance&quot;: 1000,</span>
+<span class="sd">                            &quot;data_points&quot;: [</span>
+<span class="sd">                                {&quot;current&quot;: 9.43, &quot;voltage&quot;: 0.0},</span>
+<span class="sd">                                # ... insert at least 40 total IV points ...</span>
+<span class="sd">                                {&quot;current&quot;: 0.0, &quot;voltage&quot;: 46.39}</span>
+<span class="sd">                            ]</span>
+<span class="sd">                        }</span>
+<span class="sd">                    ]</span>
+
+<span class="sd">                    module.process_iv_curves(iv_curve_data=input_data)</span>
+
+<span class="sd">                Which will return a data structure:</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    [</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;temperature&quot;: 25,</span>
+<span class="sd">                            &quot;irradiance&quot;: 1000,</span>
+<span class="sd">                            &quot;short_circuit_current&quot;: 9.43,</span>
+<span class="sd">                            &quot;open_circuit_voltage&quot;: 46.39,</span>
+<span class="sd">                            &quot;mpp_current&quot;: 8.9598,</span>
+<span class="sd">                            &quot;mpp_voltage&quot;: 38.1285,</span>
+<span class="sd">                            &quot;max_power&quot;: 341.6237</span>
+<span class="sd">                        }</span>
+<span class="sd">                    ]</span>
+
+<span class="sd">                Reminder: While only one IV curve is provided in the example, multiply IV curves can be supplied.</span>
+
+<span class="sd">        :param file_path: File path to the .xlsx template for Full IV Curves. (At least 40 points are required for each IV curve.)</span>
+<span class="sd">        :type file_path: str</span>
+<span class="sd">        :param iv_curve_data: List of dictionaries, each representing an IV curve at a particular temperature/irradiance. (At least 40 points are required for each IV curve.)</span>
+<span class="sd">        :type iv_curve_data: list dict</span>
+<span class="sd">        :return: List of dictionaries, each containing extracted module electrical characteristics corresponding to the IV curve provided at a particular temperature/irradiance condition.</span>
+<span class="sd">        :rtype: list of dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if the input is the .xlsx template, parse it</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">iv_curve_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Either a file path to the .xslx template for Full IV Curves input or the properly formatted &quot;</span> 
+                <span class="s2">&quot;JSON-serializable data structure for Key IV Points input must be assigned as input. See the Python &quot;</span>
+                <span class="s2">&quot;SDK documentation (https://plantpredict-python.readthedocs.io/en/latest/) for more information.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">file_path</span> <span class="ow">and</span> <span class="n">iv_curve_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only one input option may be specified.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># if the user specifies a file_path to the .xlsx template, parse it</span>
+        <span class="k">elif</span> <span class="n">file_path</span><span class="p">:</span>
+            <span class="n">iv_curve_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_full_iv_curves_template</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Module/Generator/ProcessIVCurves&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="p">[</span><span class="n">convert_json</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">iv_curve_data</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">convert_json</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">camel_to_snake</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()]</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">generate_iv_curve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_iv_points</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Module/Generator/GenerateIVCurve*</span>
+
+<span class="sd">        Generates an IV curve given An example of using this method in practice can be found in :ref:`example_usage`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    cell_technology_type; int; Represents the cell technology type (CdTe, poly c-Si PERC, etc). Use :py:mod:`plantpredict.enumerations.CellTechnologyTypeEnum`.</span>
+<span class="sd">                    pv_model; int; Represents the 1-diode model type (1-Diode, 1-Diode with recombination). Use :py:mod:`plantpredict.enumerations.PVModelTypeEnum`.</span>
+<span class="sd">                    number_of_cells_in_series; int; Number of cells in one string of cells - unitless</span>
+<span class="sd">                    reference_irradiance; float; Must be between :py:data:`400.0` and :py:data:`1361.0` - units :py:data:`[W/m^2]`. The IV curve will represent this irradiance.</span>
+<span class="sd">                    reference_temperature; float; Must be between :py:data:`-20.0` and :py:data:`80.0` - units :py:data:`[deg-C]`. The IV curve will represent this temperature.</span>
+<span class="sd">                    stc_max_power; float; Must be between :py:data:`0.0` and :py:data:`1000.0` - units :py:data:`[W]`.</span>
+<span class="sd">                    stc_short_circuit_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_open_circuit_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_mpp_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`.</span>
+<span class="sd">                    stc_mpp_voltage; float; Must be between :py:data:`0.4` and :py:data:`1000.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    stc_power_temp_coef; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    stc_short_circuit_current_temp_coef; float; Must be between :py:data:`-0.3` and :py:data:`2.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    series_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100.0` - units :py:data:`[Ohms]`</span>
+<span class="sd">                    shunt_resistance_at_stc; float; Must be between :py:data:`0.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    dark_shunt_resistance; float; Must be between :py:data:`100.0` and :py:data:`100000.0` - units :py:data:`[Ohms]`.</span>
+<span class="sd">                    recombination_parameter; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`30.0`</span>
+<span class="sd">                    exponential_dependency_on_shunt_resistance; float; Must be between :py:data:`1.0` and :py:data:`100.0` - unitless.</span>
+<span class="sd">                    bandgap_voltage; float; Must be between :py:data:`0.5` and :py:data:`4.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    built_in_voltage; float; Required only if :py:attr:`pv_model` is :py:data:`plantpredict.enumerations.PVModelTypeEnum.ONE_DIODE_RECOMBINATION`. Must be between :py:data:`0.0` and :py:data:`3.0` - units :py:data:`[V]`.</span>
+<span class="sd">                    saturation_current_at_stc; float; Must be between :py:data:`1e-13` and :py:data:`1e-6` - units :py:data:`[A]`.</span>
+<span class="sd">                    diode_ideality_factor_at_stc; float; Must be between :py:data:`0.1` and :py:data:`5.0` - unitless.</span>
+<span class="sd">                    linear_temp_dependence_on_gamma; float; Must be between :py:data:`-3.0` and :py:data:`3.0` - units :py:data:`[%/deg-C]`.</span>
+<span class="sd">                    light_generated_current; float; Must be between :py:data:`0.1` and :py:data:`100.0` - units :py:data:`[A]`</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Output**</span>
+
+<span class="sd">            .. container:: example_output</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    [</span>
+<span class="sd">                        {&quot;current&quot;: 9.43, &quot;voltage&quot;: 0.0},</span>
+<span class="sd">                        # ... list will be equal in length to num_iv_points ...</span>
+<span class="sd">                        {&quot;current&quot;: 0.0, &quot;voltage&quot;: 46.39}</span>
+<span class="sd">                    ]</span>
+
+<span class="sd">        :param num_iv_points: Number of IV points to generate (defaults to 100).</span>
+<span class="sd">        :type num_iv_points: int</span>
+<span class="sd">        :return: List of IV generated IV points (See &quot;Example Output&quot;)</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_iv_points</span> <span class="o">=</span> <span class="n">num_iv_points</span>
+
+        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Module/Generator/GenerateIVCurve&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">convert_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@handle_error_response</span>
+    <span class="nd">@handle_refused_connection</span>
+    <span class="k">def</span> <span class="nf">calculate_basic_data_at_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">irradiance</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_iv_curves</span><span class="p">(</span><span class="n">iv_curve_data</span><span class="o">=</span><span class="p">[{</span>
+            <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
+            <span class="s2">&quot;irradiance&quot;</span><span class="p">:</span> <span class="n">irradiance</span><span class="p">,</span>
+            <span class="s2">&quot;data_points&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_iv_curve</span><span class="p">()</span>
+        <span class="p">}])</span></div>
+
+
+    <span class="c1"># @handle_error_response</span>
+    <span class="c1"># @handle_refused_connection</span>
+    <span class="c1"># def generate_single_diode_parameters_advanced_bulk(self, modules):</span>
+    <span class="c1">#    &quot;&quot;&quot;</span>
+    <span class="c1">#</span>
+    <span class="c1">#    :param modules:</span>
+    <span class="c1">#    :return:</span>
+    <span class="c1">#    &quot;&quot;&quot;</span>
+    <span class="c1">#    return requests.post(</span>
+    <span class="c1">#        url=self.api.base_url + &quot;/Module/Generator/GenerateSingleDiodeParametersAdvancedBulk&quot;,</span>
+    <span class="c1">#        headers={&quot;Authorization&quot;: &quot;Bearer &quot; + self.api.access_token},</span>
+    <span class="c1">#        json=convert_json_list(modules, snake_to_camel)</span>
+    <span class="c1">#    )</span>
+
+    <span class="c1">#@handle_error_response</span>
+    <span class="c1">#@handle_refused_connection</span>
+    <span class="c1">#def optimize_series_resistance_bulk(self, modules):</span>
+    <span class="c1">#    &quot;&quot;&quot;</span>
+    <span class="c1">#</span>
+    <span class="c1">#   :param modules:</span>
+    <span class="c1">#    :return:</span>
+    <span class="c1">#    &quot;&quot;&quot;</span>
+    <span class="c1">#    return requests.post(</span>
+    <span class="c1">#        url=self.api.base_url + &quot;/Module/Generator/OptimizeSeriesResistanceBulk&quot;,</span>
+    <span class="c1">#        headers={&quot;Authorization&quot;: &quot;Bearer &quot; + self.api.access_token},</span>
+    <span class="c1">#        json=convert_json_list(modules, snake_to_camel)</span>
+    <span class="c1">#    )</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Terabase Energy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ <script type="text/javascript">
+    $(document).ready(function() {
+        $(".toggle > *").hide();
+        $(".toggle .header").show();
+        $(".toggle .header").click(function() {
+            $(this).parent().children().not(".header").toggle(400);
+            $(this).parent().children(".header").toggleClass("open");
+        })
+    });
+</script>
+
+
+</body>
+</html>

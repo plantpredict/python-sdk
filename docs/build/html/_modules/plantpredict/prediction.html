@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="python" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plantpredict.prediction &mdash; plantpredict-python 1.0.17 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f0215982"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            plantpredict-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authentication_oauth2.html">API Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sdk_reference.html">SDK Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_usage.html">Example Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">plantpredict-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plantpredict.prediction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plantpredict.prediction</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">plantpredict.plant_predict_entity</span> <span class="kn">import</span> <span class="n">PlantPredictEntity</span>
+<span class="kn">from</span> <span class="nn">plantpredict.utilities</span> <span class="kn">import</span> <span class="n">convert_json</span><span class="p">,</span> <span class="n">snake_to_camel</span>
+<span class="kn">from</span> <span class="nn">plantpredict.error_handlers</span> <span class="kn">import</span> <span class="n">handle_refused_connection</span><span class="p">,</span> <span class="n">handle_error_response</span><span class="p">,</span> <span class="n">APIError</span>
+<span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">PredictionStatusEnum</span><span class="p">,</span> <span class="n">EntityTypeEnum</span>
+
+
+<div class="viewcode-block" id="Prediction">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.prediction.Prediction">[docs]</a>
+<span class="k">class</span> <span class="nc">Prediction</span><span class="p">(</span><span class="n">PlantPredictEntity</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:mod:`plantpredict.Prediction` entity models a single energy prediction within a</span>
+<span class="sd">    :py:mod:`plantpredict.Project`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Prediction.create">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.prediction.Prediction.create">[docs]</a>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_closest_ashrae_station</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">error_spa_var</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">error_model_acc</span><span class="o">=</span><span class="mf">2.9</span><span class="p">,</span> <span class="n">error_int_ann_var</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+               <span class="n">error_sens_acc</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">error_mon_acc</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">year_repeater</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">PredictionStatusEnum</span><span class="o">.</span><span class="n">DRAFT_PRIVATE</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Project/ :py:attr:`project_id` /Prediction*</span>
+
+<span class="sd">        Creates a new :py:mod:`plantpredict.Prediction` entity in the PlantPredict database using the attributes</span>
+<span class="sd">        assigned to the local object instance. Automatically assigns the resulting :py:attr:`id` to the local object</span>
+<span class="sd">        instance. See the minimum required attributes (below) necessary to successfully create a new</span>
+<span class="sd">        :py:mod:`plantpredict.Prediction`. Note that the full scope of attributes is not limited to the minimum</span>
+<span class="sd">        required set. **Important Note:** the minimum required attributes necessary to create a</span>
+<span class="sd">        :py:mod:`plantpredict.Prediction` is not sufficient to successfully call :py:meth:`plantpredict.Prediction.run`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes for successful Prediction creation</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    name; str; Name of prediction</span>
+<span class="sd">                    project_id; int; ID of project within which to contain the prediction</span>
+<span class="sd">                    year_repeater; int; Must be between :py:data:`1` and :py:data:`50` - unitless.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                First, import the plantpredict library and receive an authentication [EDIT THIS] plantpredict.self.api.access_token in your</span>
+<span class="sd">                Python session, as shown in Step 3 of :ref:`authentication_oauth2`. Then instantiate a local Prediction.</span>
+<span class="sd">                object.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    module_to_create = plantpredict.Prediction()</span>
+
+<span class="sd">                Populate the Prediction&#39;s require attributes by either directly assigning them...</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    from plantpredict.enumerations import PredictionStatusEnum</span>
+
+<span class="sd">                    prediction_to_create.name = &quot;Test Prediction&quot;</span>
+<span class="sd">                    prediction_to_create.project_id = 1000</span>
+<span class="sd">                    prediction_to_create.status = PredictionStatusEnum.DRAFT_SHARED</span>
+<span class="sd">                    prediction_to_create.year_repeater = 1</span>
+
+<span class="sd">                ...OR via dictionary assignment.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    prediction_to_create.__dict__ = {</span>
+<span class="sd">                        &quot;name&quot;: &quot;Test Prediction&quot;,</span>
+<span class="sd">                        &quot;model&quot;: &quot;Test Module&quot;,</span>
+<span class="sd">                        &quot;status&quot;: PredictionStatusEnum.DRAFT_SHARED,</span>
+<span class="sd">                        &quot;year_repeater&quot;: 1,</span>
+<span class="sd">                    }</span>
+
+<span class="sd">                Create a new prediction in the PlantPredict database, and observe that the Module now has a unique</span>
+<span class="sd">                database identifier.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    prediction_to_create.create()</span>
+
+<span class="sd">                    print(prediction_to_create.id)</span>
+
+<span class="sd">        :return: A dictionary containing the prediction id.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_spa_var</span> <span class="o">=</span> <span class="n">error_spa_var</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_model_acc</span> <span class="o">=</span> <span class="n">error_model_acc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_int_ann_var</span> <span class="o">=</span> <span class="n">error_int_ann_var</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_sens_acc</span> <span class="o">=</span> <span class="n">error_sens_acc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_mon_acc</span> <span class="o">=</span> <span class="n">error_mon_acc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year_repeater</span> <span class="o">=</span> <span class="n">year_repeater</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+
+        <span class="k">if</span> <span class="n">use_closest_ashrae_station</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign_plant_design_temperature_with_closest_ashrae_station</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Prediction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_assign_plant_design_temperature_with_closest_ashrae_station</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assigns the plant design temperatures by using the closest ASHRAE station (based on the associated project&#39;s</span>
+<span class="sd">        latitude and longitude).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">project</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">ashrae</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">ashrae</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+
+        <span class="n">ashrae</span><span class="o">.</span><span class="n">get_closest_station</span><span class="p">()</span>
+
+        <span class="c1"># set relevant attributes from ASHRAE to Prediction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ashrae_station</span> <span class="o">=</span> <span class="n">ashrae</span><span class="o">.</span><span class="n">station_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cool_996</span> <span class="o">=</span> <span class="n">ashrae</span><span class="o">.</span><span class="n">cool_996</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_50_year</span> <span class="o">=</span> <span class="n">ashrae</span><span class="o">.</span><span class="n">max_50_year</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_50_year</span> <span class="o">=</span> <span class="n">ashrae</span><span class="o">.</span><span class="n">min_50_year</span>
+
+<div class="viewcode-block" id="Prediction.delete">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.prediction.Prediction.delete">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;HTTP Request: DELETE /Project/{ProjectId}/Prediction/{Id}</span>
+
+<span class="sd">        Deletes an existing Prediction entity in PlantPredict. The local instance of the Project entity must have</span>
+<span class="sd">        attribute self.id identical to the prediction id of the Prediction to be deleted.</span>
+
+<span class="sd">        :return: A dictionary {&quot;is_successful&quot;: True}.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Prediction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Prediction.get">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.prediction.Prediction.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;HTTP Request: GET /Project/{ProjectId}/Prediction/{Id}</span>
+
+<span class="sd">        Retrieves an existing Prediction entity in PlantPredict and automatically assigns all of its attributes to the</span>
+<span class="sd">        local Prediction object instance. The local instance of the Prediction entity must have attribute self.id</span>
+<span class="sd">        identical to the prediction id of the Prediction to be retrieved.</span>
+
+<span class="sd">        :return: A dictionary containing all of the retrieved Prediction attributes.</span>
+<span class="sd">        :rtype: dict</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span> <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span> <span class="o">=</span> <span class="n">project_id</span> <span class="k">if</span> <span class="n">project_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Prediction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Prediction.update">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.prediction.Prediction.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;HTTP Request: PUT /Project/{ProjectId}/Prediction</span>
+
+<span class="sd">        Updates an existing Prediction entity in PlantPredict using the full attributes of the local Prediction</span>
+<span class="sd">        instance. Calling this method is most commonly preceded by instantiating a local instance of Prediction with a</span>
+<span class="sd">        specified prediction id, calling the Prediction.get() method, and changing any attributes locally.</span>
+
+<span class="sd">        :return: A dictionary {&quot;is_successful&quot;: True}.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Prediction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="k">def</span> <span class="nf">_wait_for_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">is_complete</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">is_complete</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_status</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">is_complete</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        POST /Project/{ProjectId}/Prediction/{PredictionId}/Run</span>
+
+<span class="sd">        Runs the Prediction and waits for simulation to complete. The input variable &quot;export_options&quot; should take the</span>
+
+<span class="sd">        :param export_options: Contains options for exporting</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">/Run&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">convert_json</span><span class="p">(</span><span class="n">export_options</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span> <span class="k">if</span> <span class="n">export_options</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="c1"># TODO why didn&#39;t this return an error? it only returned when I stopped the script</span>
+
+        <span class="c1"># observes task queue to wait for prediction run to complete</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_prediction</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">get_results_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;GET /Project/{ProjectId}/Prediction/{Id}/ResultSummary&quot;&quot;&quot;</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">/ResultSummary&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">APIError</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">get_results_details</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;GET /Project/{ProjectId}/Prediction/{Id}/ResultDetails&quot;&quot;&quot;</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">/ResultDetails&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">APIError</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">get_nodal_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;GET /Project/{ProjectId}/Prediction/{Id}/NodalJson&quot;&quot;&quot;</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">/NodalJson&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">convert_json</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">snake_to_camel</span><span class="p">)</span> <span class="k">if</span> <span class="n">params</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">APIError</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_prediction_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param new_prediction_name:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">prediction</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">original_prediction_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="c1"># initialize necessary fields</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;created_date&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;last_modified&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;last_modified_by&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;last_modified_by_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;project&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;powerplant_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;powerplant&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">new_prediction</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">new_prediction_name</span>
+        <span class="n">new_prediction</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+        <span class="n">new_prediction_id</span> <span class="o">=</span> <span class="n">new_prediction</span><span class="o">.</span><span class="n">id</span>
+
+        <span class="c1"># clone powerplant and attach to new prediction</span>
+        <span class="n">new_powerplant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">powerplant</span><span class="p">()</span>
+        <span class="n">powerplant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">powerplant</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="n">prediction_id</span><span class="o">=</span><span class="n">original_prediction_id</span><span class="p">)</span>
+        <span class="n">powerplant</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">new_powerplant</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="n">new_powerplant</span><span class="o">.</span><span class="n">prediction_id</span> <span class="o">=</span> <span class="n">new_prediction_id</span>
+        <span class="n">new_powerplant</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># initialize necessary fields</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">new_powerplant</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="n">block</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">block</span><span class="p">[</span><span class="s1">&#39;arrays&#39;</span><span class="p">]:</span>
+                <span class="n">array</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">inverter</span> <span class="ow">in</span> <span class="n">array</span><span class="p">[</span><span class="s1">&#39;inverters&#39;</span><span class="p">]:</span>
+                    <span class="n">inverter</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">dc_field</span> <span class="ow">in</span> <span class="n">inverter</span><span class="p">[</span><span class="s1">&#39;dc_fields&#39;</span><span class="p">]:</span>
+                        <span class="n">dc_field</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">new_powerplant</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">original_prediction_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">new_prediction_id</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">change_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_status</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change the status (and resulting sharing/privacy settings) of a prediction (ex. from py:attr:`DRAFT_PRIVATE` to</span>
+<span class="sd">        py:attr:`DRAFT-SHARED`.</span>
+
+<span class="sd">        :param int new_status: Enumeration representing status to change prediction to. See (or import)</span>
+<span class="sd">                               :py:class:`plantpredict.enumerations.PredictionStatusEnum`.</span>
+<span class="sd">        :param str note: Description of reason for change.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/Status&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="p">[{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">EntityTypeEnum</span><span class="o">.</span><span class="n">PREDICTION</span><span class="p">,</span>
+                <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">new_status</span><span class="p">,</span>
+                <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="n">note</span>
+            <span class="p">}]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span> <span class="o">=</span> <span class="n">project_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year_repeater</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_spa_var</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_model_acc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_int_ann_var</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_sens_acc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_mon_acc</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">Prediction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">api</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Terabase Energy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ <script type="text/javascript">
+    $(document).ready(function() {
+        $(".toggle > *").hide();
+        $(".toggle .header").show();
+        $(".toggle .header").click(function() {
+            $(this).parent().children().not(".header").toggle(400);
+            $(this).parent().children(".header").toggleClass("open");
+        })
+    });
+</script>
+
+
+</body>
+</html>
