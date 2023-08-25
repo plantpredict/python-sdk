@@ -503,13 +503,8 @@ endpoint.  For example:
 
 .. code-block:: python
 
-    import json
-    with open('weather_details.json', 'rb') as json_file:
-        weather_details = json.load(json_file)
-
-Using the known latitude and longitude of the weather data location, call
-:py:meth:`~plantpredict.geo.Geo.get_location_info` query crucial location info necessary to populate the weather file's
-metadata.
+    from plantpredict.enumerations import LibraryStatusEnum
+    prediction.update_status(LibraryStatusEnum.DRAFT_SHARED)
 
 
 Upload raw weather data.
