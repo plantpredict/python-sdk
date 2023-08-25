@@ -502,6 +502,7 @@ In order to change the status of a weather, module or inverter object, one must 
 endpoint.  For example:
 
 .. code-block:: python
+
     from plantpredict.enumerations import LibraryStatusEnum
     prediction.update_status(LibraryStatusEnum.DRAFT_SHARED)
 
