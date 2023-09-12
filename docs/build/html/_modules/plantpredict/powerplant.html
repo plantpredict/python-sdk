@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="python" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plantpredict.powerplant &mdash; plantpredict-python 1.0.17 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f0215982"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            plantpredict-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authentication_oauth2.html">API Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sdk_reference.html">SDK Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_usage.html">Example Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">plantpredict-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plantpredict.powerplant</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plantpredict.powerplant</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">plantpredict.plant_predict_entity</span> <span class="kn">import</span> <span class="n">PlantPredictEntity</span>
+<span class="kn">from</span> <span class="nn">plantpredict.error_handlers</span> <span class="kn">import</span> <span class="n">handle_refused_connection</span><span class="p">,</span> <span class="n">handle_error_response</span><span class="p">,</span> <span class="n">APIError</span>
+<span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">ModuleOrientationEnum</span><span class="p">,</span> <span class="n">TrackingTypeEnum</span><span class="p">,</span> <span class="n">FacialityEnum</span>
+
+
+<div class="viewcode-block" id="PowerPlant">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.powerplant.PowerPlant">[docs]</a>
+<span class="k">class</span> <span class="nc">PowerPlant</span><span class="p">(</span><span class="n">PlantPredictEntity</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents the hierarchical structure of a power plant in PlantPredict. There is a one-to-one relationship between a</span>
+<span class="sd">    :py:class:`~plantpredict.powerplant.PowerPlant` and :py:class:`~plantpredict.prediction.Prediction`. It is linked to</span>
+<span class="sd">    that prediction via the attributes :py:attr:`project_id` and :py:attr:`prediction_id`.</span>
+
+<span class="sd">    All classes that inherit from :py:class:`~plantpredict.plant_predict_entity.PlantPredictEntity` follow the same</span>
+<span class="sd">    general usage pattern. The core class methods (:py:class:`~plantpredict.powerplant.PowerPlant.get`,</span>
+<span class="sd">    :py:class:`~plantpredict.powerplant.PowerPlant.create`, and :py:class:`~plantpredict.powerplant.PowerPlant.update`)</span>
+<span class="sd">    require that certain attributes be assigned to the instance of the class in order to run successfully, rather than</span>
+<span class="sd">    requiring direct variable inputs to the method call itself. For methods beyond these four, the input requirements</span>
+<span class="sd">    might be either attribute assignments or variable inputs to the method.</span>
+
+<span class="sd">    Sample code for properly building a :py:class:`~plantpredict.powerplant.PowerPlant` can be found in</span>
+<span class="sd">    :ref:`example_usage`. While a new :py:class:`~plantpredict.powerplant.PowerPlant` can be initialized via its</span>
+<span class="sd">    :py:meth:`~plantpredict.powerplant.PowerPlant.__init__` method, as in the following example:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        powerplant = plantpredict.powerplant.PowerPlant(api, project_id=1, prediction_id=2)</span>
+
+<span class="sd">    it is recommended to use the :py:class:`~plantpredict.api.Api` factory method</span>
+<span class="sd">    :py:meth:`~plantpredict.api.Api.powerplant`, as in the following example:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        powerplant = api.powerplant(project_id=1, prediction_id=2)</span>
+
+<span class="sd">    where both cases assume that :py:data:`api` is a properly defined :py:class:`~plantpredict.api.Api` object.</span>
+
+<span class="sd">    Note on parameters listed below: This list of attributes is comprehensive, but does not encompass 100% of parameters</span>
+<span class="sd">    that might be available via :py:meth:`~plantpredict.powerplant.PowerPlant.get` after the associated prediction is</span>
+<span class="sd">    run. The list includes all relevant attributes that a user should/can set upon building the</span>
+<span class="sd">    :py:class:`~plantpredict.powerplant.PowerPlant`, plus some of the post-prediction-run parameters.</span>
+
+<span class="sd">    :param plantpredict.api.Api api: An properly initialized instance of the PlantPredict API client class,</span>
+<span class="sd">                                     :py:class:`~plantpredict.api.Api`, which is used for authentication with the</span>
+<span class="sd">                                     PlantPredict servers, given a user&#39;s unique API credentials.</span>
+<span class="sd">    :param project_id: Unique identifier for the :py:class:`~plantpredict.project.Project` with which to associate the</span>
+<span class="sd">                       power plant. Must represent a valid, exiting project in the PlantPredict database.</span>
+<span class="sd">    :type project_id: int, None</span>
+<span class="sd">    :param prediction_id: Unique identifier for the :py:class:`~plantpredict.prediction.Prediction` with which to</span>
+<span class="sd">                          associate the power plant. Must represent a valid, existing Prediction on the given Project in</span>
+<span class="sd">                          the PlantPredict database, as represented by the input :py:data:`project_id`.</span>
+<span class="sd">    :type prediction_id: int, None</span>
+<span class="sd">    :param bool use_cooling_temp: If :py:data:`True`, the :py:attr:`kva_rating` of each inverter in the power plant is</span>
+<span class="sd">                                  calculated based on the 99.6 cooling temperature of the nearest ASHRAE station to the</span>
+<span class="sd">                                  corresponding :py:class:`~plantpredict.project.Project` (as specified by</span>
+<span class="sd">                                  :py:attr:`project_id`), the elevation of the</span>
+<span class="sd">                                  :py:class:`~plantpredict.project.Project`, and the elevation/temperature curves of the</span>
+<span class="sd">                                  inverter model specified by :py:data:`inverter_id`. Defaults to :py:data:`True`. If</span>
+<span class="sd">                                  :py:data:`False`, the :py:attr:`kva_rating` of each inverter in the power plant is set</span>
+<span class="sd">                                  as the :py:attr:`apparent_power` of the inverter model specified by</span>
+<span class="sd">                                  :py:data:`inverter_id`.</span>
+<span class="sd">    :param float lgia_limitation: Maximum power output limit for power plant according to its Large Generator</span>
+<span class="sd">                                  Interconnection Agreement (LGIA). Must be between :py:data:`0` and :py:data:`2000` -</span>
+<span class="sd">                                  units :py:data:`[MWac]`.</span>
+<span class="sd">    :param float availability_loss: Accounts for losses due to any plant-wide outage events such as inverter</span>
+<span class="sd">                                    shutdowns/failures. Must be between :py:data:`0` and :py:data:`25` - units</span>
+<span class="sd">                                    :py:data:`[%]`.</span>
+<span class="sd">    :param float power_factor: The ratio of the power that can be used and the product of the operating current and</span>
+<span class="sd">                               voltage (also referred to as Plant kVA Derate). Defaults to :py:data:`1.0`. Must be</span>
+<span class="sd">                               between :py:data:`0` and :py:data:`1`, where :py:data:`1` is a &quot;unity&quot; power factor.</span>
+<span class="sd">                               Defaults to :py:data:`1.0` in :py:meth:`~plantpredict.powerplant.PowerPlant.__init__` and</span>
+<span class="sd">                               automatically recalculated when :py:meth:`~plantpredict.powerplant.PowerPlant.create`</span>
+<span class="sd">                               called.</span>
+<span class="sd">    :param list transformers: Defaults to an empty list (:py:data:`[]`). See &quot;Example contents of</span>
+<span class="sd">                              :py:attr:`transformers`&quot; below for sample contents. Use the &quot;power plant builder&quot; method</span>
+<span class="sd">                              :py:meth:`~plantpredict.powerplant.PowerPlant.add_transformer` to easily add a new</span>
+<span class="sd">                              transformer to the attribute :py:attr:`transformers`.</span>
+<span class="sd">    :param list transmission_lines: Defaults to an empty list (:py:data:`[]`). See &quot;Example contents of</span>
+<span class="sd">                                    :py:attr:`transmission_lines`&quot; below for sample contents. Use the</span>
+<span class="sd">                                    &quot;power plant builder&quot; method</span>
+<span class="sd">                                    :py:meth:`~plantpredict.powerplant.PowerPlant.add_transmission_line` to easily add a</span>
+<span class="sd">                                    new transmission line to the attribute :py:attr:`transmission_lines`.</span>
+<span class="sd">    :param list blocks: Defaults to an empty list (:py:data:`[]`). See &quot;Example contents of :py:attr:`blocks`&quot; below</span>
+<span class="sd">                        for sample contents. Use the &quot;power plant builder&quot; method</span>
+<span class="sd">                        :py:meth:`~plantpredict.powerplant.PowerPlant.add_block` to easily add a new block to the</span>
+<span class="sd">                        attribute :py:attr:`blocks`. Subsequently use the methods</span>
+<span class="sd">                        :py:meth:`~plantpredict.powerplant.PowerPlant.add_array`,</span>
+<span class="sd">                        :py:meth:`~plantpredict.powerplant.PowerPlant.add_inverter`, and</span>
+<span class="sd">                        :py:meth:`~plantpredict.powerplant.PowerPlant.add_dc_field` to build out the full power plant</span>
+<span class="sd">                        hierarchical structure.</span>
+
+<span class="sd">    Below are some samples of the more complex attributes that would be populated after calling</span>
+<span class="sd">    :py:meth:`~plantpredict.powerplant.PowerPlant.get` on an existing power plant in PlantPredict. This also is a sample</span>
+<span class="sd">    of what the contents might look like before creating a new powerplant with</span>
+<span class="sd">    :py:meth:`~plantpredict.powerplant.PowerPlant.create` (or update an existing one with</span>
+<span class="sd">    :py:meth:`~plantpredict.powerplant.PowerPlant.update`:</span>
+
+<span class="sd">    .. container:: toggle</span>
+
+<span class="sd">        .. container:: header</span>
+
+<span class="sd">            Example contents of :py:attr:`transformers`</span>
+
+<span class="sd">        .. container:: transformers</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                powerplant.transformers = [{</span>
+<span class="sd">                    &quot;id&quot;: 23982,</span>
+<span class="sd">                    &quot;rating&quot;: 0.6,                # units [MVA]</span>
+<span class="sd">                    &quot;high_side_voltage&quot;: 4.0,     # units [kV]</span>
+<span class="sd">                    &quot;no_load_loss&quot;: 0.5,          # units [%]</span>
+<span class="sd">                    &quot;full_load_loss&quot;: 1.0,        # units [%]</span>
+<span class="sd">                    &quot;ordinal&quot;: 1</span>
+<span class="sd">                }]</span>
+
+<span class="sd">    .. container:: toggle</span>
+
+<span class="sd">        .. container:: header</span>
+
+<span class="sd">            Example contents of :py:attr:`transmission_lines`</span>
+
+<span class="sd">        .. container:: transmission_lines</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                powerplant.transmission_lines = [{</span>
+<span class="sd">                    &quot;id&quot;: 48373,</span>
+<span class="sd">                    &quot;length&quot;: 2.0,                             # units [km]</span>
+<span class="sd">                    &quot;resistance&quot;: 0.5,                         # units [Ohms/300 m]</span>
+<span class="sd">                    &quot;number_of_conductors_per_phase&quot;: 3,</span>
+<span class="sd">                    &quot;ordinal&quot;: 1</span>
+<span class="sd">                }]</span>
+
+<span class="sd">    .. container:: toggle</span>
+
+<span class="sd">        .. container:: header</span>
+
+<span class="sd">            Example contents of :py:attr:`blocks`</span>
+
+<span class="sd">        .. container:: blocks</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                from plantpredict.enumerations import TrackingTypeEnum, ModuleOrientationEnum, BacktrackingTypeEnum</span>
+
+<span class="sd">                powerplant.blocks = [{</span>
+<span class="sd">                    &quot;name&quot;: 1,</span>
+<span class="sd">                    &quot;id&quot;: 57383,</span>
+<span class="sd">                    &quot;description&quot;: &quot;Description of block.&quot;</span>
+<span class="sd">                    &quot;repeater&quot;: 5,</span>
+<span class="sd">                    &quot;energization_date&quot;: &quot;2019-12-26T16:43:55.867Z&quot;,</span>
+<span class="sd">                    &quot;use_energization_date&quot;: True,</span>
+<span class="sd">                    &quot;arrays&quot;: [{</span>
+<span class="sd">                        &quot;name&quot;: 1,</span>
+<span class="sd">                        &quot;id&quot;: 22323,</span>
+<span class="sd">                        &quot;description&quot;: &quot;Description of array.&quot;,</span>
+<span class="sd">                        &quot;repeater&quot;: 2,</span>
+<span class="sd">                        &quot;ac_collection_loss&quot;: 1.0,                              # units [%]</span>
+<span class="sd">                        &quot;das_load&quot;: 1.2,                                        # units [%]</span>
+<span class="sd">                        &quot;cooling_load&quot;: 0.8,                                    # units [%]</span>
+<span class="sd">                        &quot;additional_losses&quot;: 0.1,                               # units [%]</span>
+<span class="sd">                        &quot;match_total_inverter_kva&quot;: True,</span>
+<span class="sd">                        &quot;transformer_enabled&quot;: True,</span>
+<span class="sd">                        &quot;transformer_kva_rating&quot;: 600.0,                        # units [kVA]</span>
+<span class="sd">                        &quot;transformer_high_side_voltage&quot;: 34.7,                  # units [V]</span>
+<span class="sd">                        &quot;transformer_no_load_loss&quot;: 0.2,                        # units [%]</span>
+<span class="sd">                        &quot;transformer_full_load_loss&quot;: 0.7,                      # units [%]</span>
+<span class="sd">                        &quot;tracker_motor_losses&quot;: 0.1,                            # units [%]</span>
+<span class="sd">                        &quot;inverters&quot;: [{</span>
+<span class="sd">                            &quot;name&quot;: &quot;A&quot;,</span>
+<span class="sd">                            &quot;id&quot;: 234290,</span>
+<span class="sd">                            &quot;description&quot;: &quot;Description of inverter.&quot;</span>
+<span class="sd">                            &quot;repeater&quot;: 1,</span>
+<span class="sd">                            &quot;inverter_id&quot;: 242,</span>
+<span class="sd">                            &quot;inverter&quot;: {} # Inverter model contents</span>
+<span class="sd">                            &quot;setpoint_kw&quot;: 600.0,                                       # units [kW]</span>
+<span class="sd">                            &quot;power_factor&quot;: 1.0,</span>
+<span class="sd">                            &quot;kva_rating&quot;: 600.0,                                        # units [kW]</span>
+<span class="sd">                            &quot;dc_fields&quot;: [{</span>
+<span class="sd">                                &quot;name&quot;: 1,</span>
+<span class="sd">                                &quot;id&quot;: 235324,</span>
+<span class="sd">                                &quot;description&quot;: &quot;Description of DC field.&quot;,</span>
+<span class="sd">                                &quot;repeater&quot;: 3,</span>
+<span class="sd">                                &quot;module_id&quot;: 749,</span>
+<span class="sd">                                &quot;module&quot;: {}  # Module model contents</span>
+<span class="sd">                                &quot;tracking_type&quot;: TrackingTypeEnum.FIXED_TILT,</span>
+<span class="sd">                                &quot;module_orientation&quot;: ModuleOrientationEnum.PORTRAIT,</span>
+<span class="sd">                                &quot;tables_removed_for_pcs&quot;: 0,</span>
+<span class="sd">                                &quot;modules_high&quot;: 4,</span>
+<span class="sd">                                &quot;modules_wide&quot;: 18,</span>
+<span class="sd">                                &quot;lateral_intermodule_gap&quot;: 0.02,                                    # units [m]</span>
+<span class="sd">                                &quot;vertical_intermodule_gap&quot;: 0.02,                                   # units [m]</span>
+<span class="sd">                                &quot;field_length&quot;: 20.0,                                               # units [m]</span>
+<span class="sd">                                &quot;field_width&quot;: 11.0,                                                # units [m]</span>
+<span class="sd">                                &quot;collector_bandwidth&quot;: 2.2,                                         # units [m]</span>
+<span class="sd">                                &quot;table_length&quot;: 6.7,                                                # units [m]</span>
+<span class="sd">                                &quot;tables_per_row&quot;: 3,</span>
+<span class="sd">                                &quot;post_to_post_spacing&quot;: 1.8,                                        # units [m]</span>
+<span class="sd">                                &quot;number_of_rows&quot;: 16,</span>
+<span class="sd">                                &quot;table_to_table_spacing&quot;: 0.05,                                     # units [m]</span>
+<span class="sd">                                &quot;module_azimuth&quot;: 180,                                              # units [degrees]</span>
+<span class="sd">                                &quot;module_tilt&quot;: 30,                                                  # units [degrees]</span>
+<span class="sd">                                &quot;tracking_backtracking_type&quot;: BacktrackingTypeEnum.TRUE_TRACKING,</span>
+<span class="sd">                                &quot;tracker_pitch_angle_d&quot;: 0,                                         # units [degrees]</span>
+<span class="sd">                                &quot;minimum_tracking_limit_angle_d&quot;: -60.0,                            # units [degrees]</span>
+<span class="sd">                                &quot;maximum_tracking_limit_angle_d&quot;: 60.0,                             # units [degrees]</span>
+<span class="sd">                                &quot;tracker_stow_angle&quot;: 0,                                            # units [degrees]</span>
+<span class="sd">                                &quot;post_height&quot;: 1.5,                                                 # units [m]</span>
+<span class="sd">                                &quot;structure_shading&quot;: 2.0,                                           # units [%]</span>
+<span class="sd">                                &quot;backside_mismatch&quot;: 1.0,                                           # units [%]</span>
+<span class="sd">                                &quot;field_dc_power&quot;: 800.0,                                            # units [kW]</span>
+<span class="sd">                                &quot;modules_wired_in_series&quot;: 10,</span>
+<span class="sd">                                &quot;number_of_series_strings_wired_in_parallel&quot;: 400,</span>
+<span class="sd">                                &quot;planned_module_rating&quot;: 325.0,                                     # units [W]</span>
+<span class="sd">                                &quot;sandia_conductive_coef&quot;: -3.47,</span>
+<span class="sd">                                &quot;sandia_convective_coef&quot;: -0.0594,</span>
+<span class="sd">                                &quot;cell_to_module_temp_diff&quot;: 3.0,                                    # units [deg-C]</span>
+<span class="sd">                                &quot;heat_balance_conductive_coef&quot;: 30.7,</span>
+<span class="sd">                                &quot;heat_balance_convective_coef&quot;: 0.0,</span>
+<span class="sd">                                &quot;module_mismatch_coefficient&quot;: 1.0,                                 # units [%]</span>
+<span class="sd">                                &quot;module_quality&quot;: 1.0,                                              # units [%]</span>
+<span class="sd">                                &quot;light_induced_degradation&quot;: 1.0,                                   # units [%]</span>
+<span class="sd">                                &quot;tracker_load_loss&quot;: 0.0,                                           # units [%]</span>
+<span class="sd">                                &quot;dc_wiring_loss_at_stc&quot;: 1.5,                                       # units [%]</span>
+<span class="sd">                                &quot;dc_health&quot;: 1.0,                                                   # units [%]</span>
+<span class="sd">                            }],</span>
+<span class="sd">                        }],</span>
+<span class="sd">                    }],</span>
+<span class="sd">                }]</span>
+<span class="sd">    |</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PowerPlant.create">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.powerplant.PowerPlant.create">[docs]</a>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **POST** */Project/* :py:attr:`project_id` */Prediction/* :py:attr:`prediction_id` */PowerPlant*</span>
+
+<span class="sd">        Creates a new power plant in the PlantPredict database with the attributes assigned to the instance of</span>
+<span class="sd">        :py:class:`~plantpredict.powerplant.PowerPlant`. Automatically attaches it to a project/prediction existing in</span>
+<span class="sd">        PlantPredict associated with the assigned values for :py:attr:`project_id` and</span>
+<span class="sd">        :py:attr:`prediction_id`. Also automatically calculates the average power factor (plant design derate)</span>
+<span class="sd">        based on the power factors of each inverter. See :py:class:`~plantpredict.powerplant.PowerPlant` documentation</span>
+<span class="sd">        attributes required to successfully call this method.</span>
+
+<span class="sd">        :return: Dictionary with contents :py:data:`{&#39;is_successful&#39;: True}`.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_and_set_average_power_factor</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">/PowerPlant&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PowerPlant</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PowerPlant.get">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.powerplant.PowerPlant.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **GET** */Project/* :py:attr:`project_id` */Prediction/* :py:attr:`prediction_id` */PowerPlant*</span>
+
+<span class="sd">        Retrieves an existing :py:class:`~plantpredict.powerplant.PowerPlant` from the PlantPredict database</span>
+<span class="sd">        according to the values assigned for :py:attr:`project_id` and :py:attr:`prediction_id`, and</span>
+<span class="sd">        automatically assigns all of its attributes to the object instance.</span>
+
+<span class="sd">        :return: A dictionary containing all of the retrieved :py:class:`~plantpredict.powerplant.PowerPlant`</span>
+<span class="sd">                 attributes. (Matches the contents of the attributes :py:attr:`__dict__` after calling this method).</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">/PowerPlant&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PowerPlant</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PowerPlant.update">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.powerplant.PowerPlant.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **PUT** */Project/* :py:attr:`project_id` */Prediction/* :py:attr:`prediction_id` */PowerPlant*</span>
+
+<span class="sd">        Updates an existing :py:class:`~plantpredict.powerplant.PowerPlant` entity in PlantPredict using the full</span>
+<span class="sd">        attributes of the object instance. Calling this method is most commonly preceded by instantiating an</span>
+<span class="sd">        :py:class:`~plantpredict.powerplant.PowerPlant` object with a particular :py:attr:`project_id` and</span>
+<span class="sd">        :py:attr:`prediction_id` and calling :py:meth:`~plantpredict.powerplant.PowerPlant.get`, and changing any</span>
+<span class="sd">        attributes locally.</span>
+
+<span class="sd">        :return: Dictionary with contents :py:data:`{&#39;is_successful&#39;: True}`.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_url_suffix</span> <span class="o">=</span> <span class="s2">&quot;/Project/</span><span class="si">{}</span><span class="s2">/Prediction/</span><span class="si">{}</span><span class="s2">/PowerPlant&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PowerPlant</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_calculate_sum_power_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the sum of all of the inverter power factors (design derate) in the power plant by iterating through</span>
+<span class="sd">        each array of each block of :py:attr:`blocks`.</span>
+
+<span class="sd">        :return: Sum of all power factors of each inverter in the power plant.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">power_factors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">block</span><span class="p">[</span><span class="s1">&#39;arrays&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">inverter</span> <span class="ow">in</span> <span class="n">array</span><span class="p">[</span><span class="s1">&#39;inverters&#39;</span><span class="p">]:</span>
+                    <span class="n">power_factors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inverter</span><span class="p">[</span><span class="s1">&#39;power_factor&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">array</span><span class="p">[</span><span class="s1">&#39;repeater&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">inverter</span><span class="p">[</span><span class="s1">&#39;repeater&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">power_factors</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_num_inverters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the total number of inverters in the power plant by iterating through each array of each block of</span>
+<span class="sd">        the attribute :py:attr:`blocks`.</span>
+
+<span class="sd">        :return: Total number of inverters in the power plant.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">num_inverters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">block</span><span class="p">[</span><span class="s1">&#39;arrays&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">inverter</span> <span class="ow">in</span> <span class="n">array</span><span class="p">[</span><span class="s1">&#39;inverters&#39;</span><span class="p">]:</span>
+                    <span class="n">num_inverters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inverter</span><span class="p">[</span><span class="s1">&#39;repeater&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">array</span><span class="p">[</span><span class="s1">&#39;repeater&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">num_inverters</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_and_set_average_power_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the average power factor (design derate) of the power plant and sets it as the attribute</span>
+<span class="sd">        :py:attr:`power_factor`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">total_power_factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_sum_power_factors</span><span class="p">()</span>
+        <span class="n">total_inverters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_num_inverters</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_factor</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">total_inverters</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">total_power_factors</span> <span class="o">/</span> <span class="n">total_inverters</span>
+
+<div class="viewcode-block" id="PowerPlant.add_transformer">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.powerplant.PowerPlant.add_transformer">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rating</span><span class="p">,</span> <span class="n">high_side_voltage</span><span class="p">,</span> <span class="n">no_load_loss</span><span class="p">,</span> <span class="n">full_load_loss</span><span class="p">,</span> <span class="n">ordinal</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Appends a transformer to the attribute :py:attr:`transformers` to model the system-level of the power plant.</span>
+
+<span class="sd">        :param float rating: Transformer rating. Must be between :py:data:`0.1` and :py:data:`10000.0` - units</span>
+<span class="sd">                             :py:data:`[MVA]`.</span>
+<span class="sd">        :param float high_side_voltage: Transformer voltage. Must be between :py:data:`1.0` and :py:data:`1000.0` -</span>
+<span class="sd">                                        units :py:data:`[kV]`.</span>
+<span class="sd">        :param float no_load_loss: Transformer loss at no load. Must be between :py:data:`0.0` and :py:data:`10.0` -</span>
+<span class="sd">                                   units :py:data:`[%]`.</span>
+<span class="sd">        :param float full_load_loss: Transformer loss at full load. Must be between :py:data:`0.0` and :py:data:`10.0` -</span>
+<span class="sd">                                     units :py:data:`[%]`.</span>
+<span class="sd">        :param int ordinal: Order in sequence of :py:attr:`transformers` and :py:attr:`transmission_lines` where</span>
+<span class="sd">                            :py:data:`1` represents the closest entity to the power plant/farthest entity from the</span>
+<span class="sd">                            energy meter (1-indexed).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transformer</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="n">rating</span><span class="p">,</span>
+            <span class="s2">&quot;high_side_voltage&quot;</span><span class="p">:</span> <span class="n">high_side_voltage</span><span class="p">,</span>
+            <span class="s2">&quot;no_load_loss&quot;</span><span class="p">:</span> <span class="n">no_load_loss</span><span class="p">,</span>
+            <span class="s2">&quot;full_load_loss&quot;</span><span class="p">:</span> <span class="n">full_load_loss</span><span class="p">,</span>
+            <span class="s2">&quot;ordinal&quot;</span><span class="p">:</span> <span class="n">ordinal</span>
+        <span class="p">}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transformer</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transformers</span> <span class="o">=</span> <span class="p">[</span><span class="n">transformer</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PowerPlant.add_transmission_line">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.powerplant.PowerPlant.add_transmission_line">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_transmission_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">resistance</span><span class="p">,</span> <span class="n">number_of_conductors_per_phase</span><span class="p">,</span> <span class="n">ordinal</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Appends a transmission line to the attribute :py:attr:`transmission_lines` to model the system-level of the</span>
+<span class="sd">        power plant.</span>
+
+<span class="sd">        :param float length: Length of transmission line. Must be between :py:data:`0.1` and :py:data:`100.0` - units</span>
+<span class="sd">                     :py:data:`[km]`.</span>
+<span class="sd">        :param float resistance: Transmission line resistivity (per 300m). Must be between :py:data:`0.001` and</span>
+<span class="sd">                                 :py:data:`2` - units :py:data:`[Ohms/300m]`.</span>
+<span class="sd">        :param int number_of_conductors_per_phase: Number of conductors per phase. Must be between :py:data:`1` and</span>
+<span class="sd">                                                   :py:data:`10`.</span>
+<span class="sd">        :param ordinal: Order in sequence of :py:attr:`transformers` and :py:attr:`transmission_lines` where</span>
+<span class="sd">                        :py:data:`1` represents the closest entity to the power plant/farthest entity from the</span>
+<span class="sd">                        energy meter (1-indexed).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transmission_line</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="n">length</span><span class="p">,</span>
+            <span class="s2">&quot;resistance&quot;</span><span class="p">:</span> <span class="n">resistance</span><span class="p">,</span>
+            <span class="s2">&quot;number_of_conductors_per_phase&quot;</span><span class="p">:</span> <span class="n">number_of_conductors_per_phase</span><span class="p">,</span>
+            <span class="s2">&quot;ordinal&quot;</span><span class="p">:</span> <span class="n">ordinal</span>
+            <span class="p">}</span>
+        <span class="c1"># append new transmission line, or if list doesn&#39;t yet exist, create it</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transmission_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transmission_line</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transmission_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">transmission_line</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_validate_block_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that a given block with name `block_name` exists the power plant structure.</span>
+
+<span class="sd">        :param int block_name: Name of block. Can be found as key `name` in each dictionary item of list `self.blocks`.</span>
+<span class="sd">        :raises ValueError: Raised if no blocks in `self.blocks` have the name `block_name`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">block_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid block name in the existing power plant structure.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">block_name</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_validate_array_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">array_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that a given block with name `block_name` exists the power plant structure, and if so, that a given array</span>
+<span class="sd">        with name `array_name` is a valid array in the block.</span>
+
+<span class="sd">        :param int block_name: Name of block. Can be found as key `name` in each dictionary item of list `self.blocks`.</span>
+<span class="sd">        :param int array_name: Name of array. Can be found as key `name` in each dictionary item of list</span>
+<span class="sd">                               `self.blocks[i][&quot;arrays&quot;]`, where `i` is some valid integer index.</span>
+<span class="sd">        :raises ValueError: Raised if no blocks in `self.blocks` have the name `block_name`. Also raised if `block_name`</span>
+<span class="sd">                            is valid but there is no array in the block with name `array_name`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_block_name</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">array_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s1">&#39;arrays&#39;</span><span class="p">]]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid array name in block </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">array_name</span><span class="p">,</span> <span class="n">block_name</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_validate_inverter_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">array_name</span><span class="p">,</span> <span class="n">inverter_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that a given block with name `block_name` exists the power plant structure, and if so, that a given array</span>
+<span class="sd">        with name `array_name` is a valid array in the block, and if so that a given inverter with name `inverter_name`</span>
+<span class="sd">        is a valid inverter in the array.</span>
+
+<span class="sd">        :param int block_name: Name of block. Can be found as key `name` in each dictionary item of list `self.blocks`.</span>
+<span class="sd">        :param int array_name: Name of array. Can be found as key `name` in each dictionary item of list</span>
+<span class="sd">                               `self.blocks[i][&quot;arrays&quot;]`, where `i` is a valid integer index.</span>
+<span class="sd">        :param str inverter_name: Name of inverter. Can be found as key `name` in each dictionary item of list</span>
+<span class="sd">                                  `self.blocks[i][&quot;arrays&quot;][j][&quot;inverters&quot;]` where `i` and `j` are valid integer</span>
+<span class="sd">                                  indices.</span>
+<span class="sd">        :raises ValueError: Raised if no blocks in `self.blocks` have the name `block_name`. Also raised if `block_name`</span>
+<span class="sd">                            is valid but there is no array in the block with name `array_name`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_block_name</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array_name</span><span class="p">(</span><span class="n">block_name</span><span class="p">,</span> <span class="n">array_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">inverter_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s1">&#39;arrays&#39;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s1">&#39;inverters&#39;</span><span class="p">]]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; is not a valid inverter name in array </span><span class="si">{}</span><span class="s2"> of block </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inverter_name</span><span class="p">,</span> <span class="n">array_name</span><span class="p">,</span>
+                                                                                    <span class="n">block_name</span><span class="p">))</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">add_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_energization_date</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">energization_date</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A &quot;power plant builder&quot; helper method that creates a new block and appends it to the attribute</span>
+<span class="sd">        :py:attr:`blocks`. Block naming is sequential (numerically) - for instance, if there are 2 existing blocks with</span>
+<span class="sd">        names :py:data:`1` and :py:data:`2` (accessible via key :py:data:`name` on each block in list), the next block</span>
+<span class="sd">        created by :py:meth:`~plantpredict.PowerPlant.powerplant.add_block` will automatically have :py:data:`name`</span>
+<span class="sd">        equal to :py:data:`3`. This method does not currently account for the situation in which an existing power plant</span>
+<span class="sd">        has blocks named non-sequentially.</span>
+
+<span class="sd">        Note that this addition is not persisted to PlantPredict unless</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.update` is subsequently called.</span>
+
+<span class="sd">        :param bool use_energization_date: Enables use of energization date in power plant block. Defaults to</span>
+<span class="sd">                                           :py:data:`False`.</span>
+<span class="sd">        :param str energization_date: Timestamp representing energization date of block. Uses format</span>
+<span class="sd">                                      :py:data:`2019-12-26T16:43:55.867Z` and defaults to :py:data:`&quot;&quot;`.</span>
+<span class="sd">        :return: Name of newly added block.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;use_energization_date&quot;</span><span class="p">:</span> <span class="n">use_energization_date</span><span class="p">,</span>
+            <span class="s2">&quot;energization_date&quot;</span><span class="p">:</span> <span class="n">energization_date</span><span class="p">,</span>
+            <span class="s2">&quot;arrays&quot;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+
+        <span class="c1"># if blocks list does not exit, create new list instead of appending</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">block</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">clone_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_id_to_clone</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A &quot;power plant builder&quot; helper method that clones (copies) an existing block (and all of its children</span>
+<span class="sd">        arrays/inverters/DC fields) and appends it to attribute :py:attr:`blocks`. Particularly useful when you want to</span>
+<span class="sd">        create a new block that is similar to an existing block. Block naming is sequential (numerically) - for</span>
+<span class="sd">        instance, if there are 2 existing blocks with names :py:data`1` and :py:data:`2` (accessible via key</span>
+<span class="sd">        :py:data:`name` on each block in list), the next block created by</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.clone_block` will automatically have :py:data`name` equal to</span>
+<span class="sd">        :py:data`3`. This method does not currently account for the situation in which an existing power plant has</span>
+<span class="sd">        blocks named non-sequentially.</span>
+
+<span class="sd">        Note that this addition is not persisted to PlantPredict unless</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.update` is subsequently called.</span>
+
+<span class="sd">        :param int block_id_to_clone: Unique identifier of the block you wis you clone. Can be found in the relevant</span>
+<span class="sd">                                      block dictionary (in list :py:attr:`self.blocks`) with key :py:data:`id`.</span>
+<span class="sd">        :return: Name of newly cloned block.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">block_to_clone</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">block_id_to_clone</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">block_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">block_to_clone</span><span class="p">)</span>
+        <span class="n">block_copy</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block_copy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">add_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">transformer_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">match_total_inverter_kva</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                  <span class="n">transformer_kva_rating</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repeater</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ac_collection_loss</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">das_load</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">cooling_load</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                  <span class="n">additional_losses</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">transformer_high_side_voltage</span><span class="o">=</span><span class="mf">34.5</span><span class="p">,</span> <span class="n">transformer_no_load_loss</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                  <span class="n">transformer_full_load_loss</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A &quot;power plant builder&quot; helper method that adds an array to the block specified by :py:data:`block_name` on the</span>
+<span class="sd">        :py:class:`~plantpredict.powerplant.PowerPlant`. Array naming is sequential (numerically) - for instance, if</span>
+<span class="sd">        there are 2 existing arrays with names :py:data:`1` and :py:data:`2` (accessible via key :py:data:`name` for a</span>
+<span class="sd">        given array dictionary), the next array created by :py:meth:`~plantpredict.powerplant.PowerPlant.add_array` will</span>
+<span class="sd">        automatically have :py:data:`name` equal to :py:data:`3`. This method does not currently account for the</span>
+<span class="sd">        situation in which an existing power plant has arrays named non-sequentially.</span>
+
+<span class="sd">        Note that this addition is not persisted to PlantPredict unless</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.update` is subsequently called.</span>
+
+<span class="sd">        :param int block_name: Name (1-indexed integer) of the parent block to add the array to. Can be found in the</span>
+<span class="sd">                               relevant block dictionary (in attribute :py:attr:`blocks`) with key :py:data:`id`. This</span>
+<span class="sd">                               value is returned for a new block when you create one with</span>
+<span class="sd">                               :py:meth:`~plantpredict.powerplant.PowerPlant.add_block`. Must be between :py:data:`1`</span>
+<span class="sd">                               and :py:data:`99`.</span>
+<span class="sd">        :param bool transformer_enabled: If :py:data:`True`, enables a medium-voltage (MV) transformer for the array.</span>
+<span class="sd">                                         Defaults to :py:data:`True`.</span>
+<span class="sd">        :param bool match_total_inverter_kva: If :py:data:`True`, the transformer size will match the total inverter kVA</span>
+<span class="sd">                                              of the inverter behind the transformer, and the input</span>
+<span class="sd">                                              :py:data:`transformer_kva_rating` won&#39;t be used. Defaults to</span>
+<span class="sd">                                              :py:data:`True`.</span>
+<span class="sd">        :param transformer_kva_rating: User-specified transformer kVA rating. Only used if</span>
+<span class="sd">                                       :py:data:`match_total_inverter_kva` is set to :py:data:`False`. Defaults to</span>
+<span class="sd">                                       :py:data:`None`. Must be between :py:data:`0` and :py:data:`20000` - units</span>
+<span class="sd">                                       :py:data:`[kVA]`.</span>
+<span class="sd">        :type transformer_kva_rating: float, None</span>
+<span class="sd">        :param int repeater: Number of identical arrays of this type in the parent block.  Defaults to :py:data:`1`.</span>
+<span class="sd">                             Must be between :py:data:`1` and :py:data:`10000`.</span>
+<span class="sd">        :param float ac_collection_loss: Accounts for ohmic losses in the AC wiring between the array and parent block.</span>
+<span class="sd">                                         Defaults to :py:data:`1`.Must be between :py:data:`0` and :py:data:`30` - units</span>
+<span class="sd">                                         :py:data:`[%]`.</span>
+<span class="sd">        :param float das_load: Accounts for parasitic losses due to the data acquisition system (DAS). Can also be used</span>
+<span class="sd">                               for general time-constant parasitic loss accounting. Defaults to :py:data:`800`. Must be</span>
+<span class="sd">                               between :py:data:`0` and :py:data:`5000` - units :py:data:`[W]`.</span>
+<span class="sd">        :param float cooling_load: Accounts for losses from the power conditioning system (PCS) shelter cooling system.</span>
+<span class="sd">                                   Defaults to :py:data:`0.0`. Must be between :py:data:`0` and :py:data:`5000` - units</span>
+<span class="sd">                                   :py:data:`[W]`.</span>
+<span class="sd">        :param float additional_losses: Additional night time losses. Defaults to :py:data:`0`. Must be between</span>
+<span class="sd">                                        :py:data:`0` and :py:data:`20000` - units :py:data:`[W]`.</span>
+<span class="sd">        :param float transformer_high_side_voltage: Transformer high side voltage (the AC collection line voltage</span>
+<span class="sd">                                                    defines the high-side of a MV inverter). Defaults to</span>
+<span class="sd">                                                    :py:data:`34.5`. Must be between :py:data:`0` and :py:data:`66` -</span>
+<span class="sd">                                                    units :py:data:`[V]`.</span>
+<span class="sd">        :param float transformer_no_load_loss: Accounts for transformer losses with no load. Defaults to :py:data:`0.2`.</span>
+<span class="sd">                                               Must be between :py:data:`0` and :py:data:`10` - units :py:data:`[%]`.</span>
+<span class="sd">        :param float transformer_full_load_loss: Accounts for transformer losses with full load. Defaults to</span>
+<span class="sd">                                                 :py:data:`0.7`. Must be between :py:data:`0` and :py:data:`10` - units</span>
+<span class="sd">                                                 :py:data:`[%]`.</span>
+<span class="sd">        :param str description: Description of the array. Must be :py:data:`250` characters or less. Defaults to</span>
+<span class="sd">                                :py:data:`&quot;&quot;`.</span>
+<span class="sd">        :raises ValueError: Raised if :py:data:`block_name` is not a valid block name in the existing power plant.</span>
+<span class="sd">        :return: The name of the newly added array.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_block_name</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
+
+        <span class="n">array</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;repeater&quot;</span><span class="p">:</span> <span class="n">repeater</span><span class="p">,</span>
+            <span class="s2">&quot;ac_collection_loss&quot;</span><span class="p">:</span> <span class="n">ac_collection_loss</span><span class="p">,</span>
+            <span class="s2">&quot;das_load&quot;</span><span class="p">:</span> <span class="n">das_load</span><span class="p">,</span>
+            <span class="s2">&quot;cooling_load&quot;</span><span class="p">:</span> <span class="n">cooling_load</span><span class="p">,</span>
+            <span class="s2">&quot;additional_losses&quot;</span><span class="p">:</span> <span class="n">additional_losses</span><span class="p">,</span>
+            <span class="s2">&quot;transformer_enabled&quot;</span><span class="p">:</span> <span class="n">transformer_enabled</span><span class="p">,</span>
+            <span class="s2">&quot;match_total_inverter_kva&quot;</span><span class="p">:</span> <span class="n">match_total_inverter_kva</span><span class="p">,</span>
+            <span class="s2">&quot;transformer_high_side_voltage&quot;</span><span class="p">:</span> <span class="n">transformer_high_side_voltage</span><span class="p">,</span>
+            <span class="s2">&quot;transformer_no_load_loss&quot;</span><span class="p">:</span> <span class="n">transformer_no_load_loss</span><span class="p">,</span>
+            <span class="s2">&quot;transformer_full_load_loss&quot;</span><span class="p">:</span> <span class="n">transformer_full_load_loss</span><span class="p">,</span>
+            <span class="s2">&quot;inverters&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match_total_inverter_kva</span><span class="p">:</span>
+            <span class="n">array</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;transformer_kva_rating&quot;</span><span class="p">:</span> <span class="n">transformer_kva_rating</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">_get_inverter_apparent_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inverter_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the apparent power of an inverter specified by its unique identifier.</span>
+
+<span class="sd">        :param int inverter_id: Unique identifier of an Inverter in the PlantPredict Inverter database.</span>
+<span class="sd">        :return: Apparent power of inverter model - units `[kVA]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inverter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">inverter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">inverter_id</span><span class="p">)</span>
+        <span class="n">inverter</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">inverter</span><span class="o">.</span><span class="n">apparent_power</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">_get_inverter_kva_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inverter_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the inverters kVA rating based on the elevation and 99.6 Cooling Temperature (which comes</span>
+<span class="sd">        from the ASHRAE station nearest to the latitude and longitude) of the :py:class:`~plantpredict.project.Project`</span>
+<span class="sd">        corresponding to `self.project_id`.</span>
+
+<span class="sd">        :param int inverter_id: Unique identifier of an Inverter in the PlantPredict Inverter database.</span>
+<span class="sd">        :return: Kilovolt-Ampere rating, used to rate/size the transformer of a power plant - units py:data:`[kVA]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># retrieve ASHRAE station based on latitude and longitude of project associated with power plant</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">project</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">prediction</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prediction_id</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">prediction</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">ashrae</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">ashrae</span><span class="p">(</span>
+            <span class="n">latitude</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+            <span class="n">longitude</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+            <span class="n">station_name</span><span class="o">=</span><span class="n">prediction</span><span class="o">.</span><span class="n">ashrae_station</span>
+        <span class="p">)</span>
+        <span class="n">ashrae</span><span class="o">.</span><span class="n">get_station</span><span class="p">()</span>
+
+        <span class="c1"># use the kVA endpoint to calculate the kVA with elevation and 99.6 cooling temp of nearest ASHRAE station</span>
+        <span class="n">inverter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">inverter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">inverter_id</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">inverter</span><span class="o">.</span><span class="n">get_kva</span><span class="p">(</span>
+            <span class="n">elevation</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">elevation</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">ashrae</span><span class="o">.</span><span class="n">cool_996</span><span class="p">,</span>
+            <span class="n">use_cooling_temp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cooling_temp</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;kva&#39;</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_validate_inverter_setpoint_inputs</span><span class="p">(</span><span class="n">setpoint_kw</span><span class="p">,</span> <span class="n">power_factor</span><span class="p">,</span> <span class="n">kva_rating</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures valid inputs for :py:data:`setpoint_kw` and :py:data:`power_factor`. In general, ensures that the ratio</span>
+<span class="sd">        `power_factor = setpoint_kw / kva_rating` is maintained, while kva_rating is held constant.</span>
+
+<span class="sd">        :param float, None setpoint_kw: Inverter setpoint. Must be between :py:data:`1` and :py:data:`10000` - units</span>
+<span class="sd">                                        `[kW]`.</span>
+<span class="sd">        :param float power_factor: The ratio of the power that can be used and the product of the operating current and</span>
+<span class="sd">                                   voltage. Must be between :py:data:`0` and :py:data:`1`, where `1` is a &quot;unity&quot; power</span>
+<span class="sd">                                   factor.</span>
+<span class="sd">        :param float kva_rating: Inverter kVA rating.</span>
+<span class="sd">        :raises ValueError: Raised if :py:data:`setpoint_kw` is not `None` and :py:data:`power_factor` is not `1.0`.</span>
+<span class="sd">        :return: Valid inverter setpoint and power factor (design derate).</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if setpoint isn&#39;t provided, calculate by multiplying design derate by kvarating</span>
+        <span class="k">if</span> <span class="n">setpoint_kw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">setpoint_kw</span> <span class="o">=</span> <span class="n">power_factor</span> <span class="o">*</span> <span class="n">kva_rating</span>
+
+        <span class="c1"># if setpoint is provided, recalculate design derate as the ratio of setpoint ot kva rating</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">setpoint_kw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">power_factor</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">):</span>
+            <span class="n">power_factor</span> <span class="o">=</span> <span class="n">setpoint_kw</span> <span class="o">/</span> <span class="n">kva_rating</span>
+
+        <span class="c1"># setpoint cannot be provided when a non-unity power factor is provided (since kva rating is constant)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">setpoint_kw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">power_factor</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;setpoint_kw can not be specified while a non-unity (non-1.0) power factor is specified.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">setpoint_kw</span><span class="p">,</span> <span class="n">power_factor</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">add_inverter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">array_name</span><span class="p">,</span> <span class="n">inverter_id</span><span class="p">,</span> <span class="n">setpoint_kw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">power_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">repeater</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A &quot;power plant builder&quot; helper method that adds an inverter to an array specified by :py:data:`array_name`,</span>
+<span class="sd">        which is a child of a block specified by :py:data:`block_name` on the</span>
+<span class="sd">        :py:class:`~plantpredict.powerplant.PowerPlant`. Inverter naming is sequential (alphabetically) - for instance,</span>
+<span class="sd">        if there are 2 existing inverters with names :py:data:`&quot;A&quot;` and :py:data:`&quot;B&quot;` (accessible via key</span>
+<span class="sd">        :py:data:`name` for a given inverter dictionary), the next array created by</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.add_inverter` will automatically have :py:data:`name` equal to</span>
+<span class="sd">        :py:data:`&quot;C&quot;`. This method does not currently account for the situation in which an existing power plant has</span>
+<span class="sd">        inverters named non-sequentially.</span>
+
+<span class="sd">        The inverter :py:data:&#39;kva_rating` will be set based on the power plant-level attribute</span>
+<span class="sd">        :py:attr:`use_cooling_temp`. If :py:attr:`use_cooling_temp` is :py:data:`True`, this value is automatically</span>
+<span class="sd">        calculated based on the 99.6 cooling temperature of the nearest ASHRAE station to the corresponding</span>
+<span class="sd">        :py:class:`~plantpredict.project.Project` (as specified by the attribute :py:attr:`project_id`), the elevation</span>
+<span class="sd">        of the :py:class:`~plantpredict.project.Project`, and the elevation/temperature curves of the inverter model</span>
+<span class="sd">        specified by :py:data:`inverter_id`. If :py:attr:`use_cooling_temp` is :py:data:`False`, then</span>
+<span class="sd">        :py:data:`kva_rating` is set as the :py:attr:`apparent_power` of the inverter model specified by</span>
+<span class="sd">        :py:data:`inverter_id`.</span>
+
+<span class="sd">        Note that this addition is not persisted to PlantPredict unless</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.update` is subsequently called.</span>
+
+<span class="sd">        :param int block_name: Name (1-indexed integer) of the parent block to add the inverter to. Can be found in the</span>
+<span class="sd">                               relevant block dictionary (in attribute :py:attr:`blocks`) with key :py:data:`id`.  This</span>
+<span class="sd">                               value is returned for a new block when you create one with</span>
+<span class="sd">                               :py:meth:`~plantpredict.powerplant.PowerPlant.add_block`. Must be between :py:data:`1`</span>
+<span class="sd">                               and :py:data:`99`.</span>
+<span class="sd">        :param int array_name: Name (1-indexed integer) of the parent array to add the inverter to. This value is</span>
+<span class="sd">                               returned for a new array when you create one with</span>
+<span class="sd">                               :py:meth:`~plantpredict.powerplant.PowerPlant.add_array`. Must be between :py:data:`1`</span>
+<span class="sd">                               and :py:data:`99`.</span>
+<span class="sd">        :param int inverter_id: Unique identifier of an inverter model in the PlantPredict Inverter database to use.</span>
+<span class="sd">        :param setpoint_kw: Inverter setpoint. Must be between :py:data:`1` and :py:data:`10000` - units</span>
+<span class="sd">                            :py:data:`[kW]`. If left as default (:py:data:`None`), will be automatically calculated as</span>
+<span class="sd">                            the product between :py:data:`power_factor` and the inverter kVA rating.</span>
+<span class="sd">        :type setpoint_kw: float, None</span>
+<span class="sd">        :param float power_factor: The ratio of the power that can be used and the product of the operating current and</span>
+<span class="sd">                                   voltage (also referred to as design derate). Must be between :py:data:`0` and</span>
+<span class="sd">                                   :py:data:`1`, where :py:data:`1` is a &quot;unity&quot; power factor. Defaults to</span>
+<span class="sd">                                   :py:data:`1.0`.</span>
+<span class="sd">        :param int repeater: Number of identical inverters of this type in the parent array. Must be between</span>
+<span class="sd">                             :py:data:`1` and :py:data:`10000`. Defaults to :py:data:`1`.</span>
+<span class="sd">        :raises ValueError: Raised if :py:data:`block_name` is not a valid block name in the existing power plant, or if</span>
+<span class="sd">                            the :py:data:`block_name` is valid but :py:data:`array_name` is not a valid array name in</span>
+<span class="sd">                            the block. Also raised if :py:data:`setpoint_kw` is not :py:data:`None` and</span>
+<span class="sd">                            :py:data:`power_factor` is not :py:data:`1.0`.</span>
+<span class="sd">        :return: The name of the newly added inverter.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># validate and prepare inverter parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array_name</span><span class="p">(</span><span class="n">block_name</span><span class="p">,</span> <span class="n">array_name</span><span class="p">)</span>
+
+        <span class="n">kva_rating</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_inverter_kva_rating</span><span class="p">(</span><span class="n">inverter_id</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cooling_temp</span>
+                      <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_inverter_apparent_power</span><span class="p">(</span><span class="n">inverter_id</span><span class="p">))</span>
+        <span class="n">setpoint_kw</span><span class="p">,</span> <span class="n">power_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inverter_setpoint_inputs</span><span class="p">(</span><span class="n">setpoint_kw</span><span class="p">,</span> <span class="n">power_factor</span><span class="p">,</span> <span class="n">kva_rating</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">])),</span>
+            <span class="s2">&quot;repeater&quot;</span><span class="p">:</span> <span class="n">repeater</span><span class="p">,</span>
+            <span class="s2">&quot;inverter_id&quot;</span><span class="p">:</span> <span class="n">inverter_id</span><span class="p">,</span>
+            <span class="s2">&quot;setpoint_kw&quot;</span><span class="p">:</span> <span class="n">setpoint_kw</span><span class="p">,</span>
+            <span class="s2">&quot;power_factor&quot;</span><span class="p">:</span> <span class="n">power_factor</span><span class="p">,</span>
+            <span class="s2">&quot;dc_fields&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;kva_rating&quot;</span><span class="p">:</span> <span class="n">kva_rating</span>
+        <span class="p">})</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_default_module_azimuth_from_latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines the default module azimuth (the orientation of the entire DC field) based on the latitude of the</span>
+<span class="sd">        :py:class:`~plantpredict.project.Project` associated with the :py:class:`~plantpredict.powerplant.PowerPlant`</span>
+<span class="sd">        (using :py:attr:`self.project_id`). By default, the DC field is set to be oriented south if above equator. The</span>
+<span class="sd">        convention is 0.0 degrees for North-facing arrays.</span>
+
+<span class="sd">        :return: Default azimuth, :py:data:`180.0` if latitude is above equator, otherwise :py:data:`0.0` - units</span>
+<span class="sd">                 `[degrees]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">azimuth</span> <span class="o">=</span> <span class="mf">180.0</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">latitude</span> <span class="o">&gt;=</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="n">azimuth</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_collector_bandwidth</span><span class="p">(</span><span class="n">module_width</span><span class="p">,</span> <span class="n">module_length</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span> <span class="n">modules_high</span><span class="p">,</span>
+                                       <span class="n">vertical_intermodule_gap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the total width/depth of each table/row of modules in the DC field. The collector bandwidth is</span>
+<span class="sd">        calculated by multiplying the number of modules high (number of ranks) by each module&#39;s vertical dimension,</span>
+<span class="sd">        which is dependent on if the modules is oriented in portrain or landscape, and then adding the vertical space</span>
+<span class="sd">        between each module.</span>
+
+<span class="sd">        :param float module_width: Width of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                   :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float module_length: Length of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                    :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param int module_orientation: Represents the orientation (portrait or landscape) of modules in the DC field.</span>
+<span class="sd">                                       Use :py:class:`~plantpredict.enumerations.ModuleOrientationEnum`.</span>
+<span class="sd">        :param int modules_high: Number of modules high per table (number of ranks). Must be between :py:data:`1` and</span>
+<span class="sd">                                 :py:data:`50`.</span>
+<span class="sd">        :param vertical_intermodule_gap: vertical gap between each module on the mounting structure. Must be between</span>
+<span class="sd">                                         :py:data:`0` and py:data:`1` - units `[m]&#39;.</span>
+<span class="sd">        :return: Collector bandwidth for a table in the DC field - units `[m]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">module_bandwidth</span> <span class="o">=</span> <span class="n">module_width</span> <span class="k">if</span> <span class="n">module_orientation</span> <span class="o">==</span> <span class="n">ModuleOrientationEnum</span><span class="o">.</span><span class="n">LANDSCAPE</span> <span class="k">else</span> <span class="n">module_length</span>
+
+        <span class="k">return</span> <span class="n">modules_high</span> <span class="o">*</span> <span class="n">module_bandwidth</span> <span class="o">/</span> <span class="mf">1000.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">modules_high</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">vertical_intermodule_gap</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_table_length</span><span class="p">(</span><span class="n">modules_wide</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span> <span class="n">module_length</span><span class="p">,</span> <span class="n">module_width</span><span class="p">,</span> <span class="n">lateral_intermodule_gap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the length of each table (mounting structure) in meters, for a particular DC field.</span>
+
+<span class="sd">        :param int modules_wide: Number of modules across per table. Must be between :py:data:`1` and :py:data:`100`.</span>
+<span class="sd">        :param int module_orientation: Represents the orientation (portrait or landscape) of modules in the DC field.</span>
+<span class="sd">                                       Use :py:class:`~plantpredict.enumerations.ModuleOrientationEnum`.</span>
+<span class="sd">        :param float module_length: Length of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                    :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float module_width: Width of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                   :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float lateral_intermodule_gap: Lateral gap between each module on the mounting structure. Must be between</span>
+<span class="sd">                                              :py:data:`0` and py:data:`1` - units `[m]&#39;.</span>
+<span class="sd">        :return: Length of each table (mounting structure) for DC field - units `[m]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># choose the relevant module dimension (length or width) based on the module orientation</span>
+        <span class="n">module_dimension</span> <span class="o">=</span> <span class="n">module_length</span> <span class="o">/</span> <span class="mf">1000.0</span> <span class="k">if</span> <span class="n">module_orientation</span> <span class="o">==</span> <span class="n">ModuleOrientationEnum</span><span class="o">.</span><span class="n">LANDSCAPE</span> \
+            <span class="k">else</span> <span class="n">module_width</span> <span class="o">/</span> <span class="mf">1000.0</span>
+
+        <span class="k">return</span> <span class="n">modules_wide</span><span class="o">*</span><span class="n">module_dimension</span> <span class="o">+</span> <span class="n">lateral_intermodule_gap</span><span class="o">*</span><span class="p">(</span><span class="n">modules_wide</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_tables_per_row</span><span class="p">(</span><span class="n">field_dc_power</span><span class="p">,</span> <span class="n">planned_module_rating</span><span class="p">,</span> <span class="n">modules_high</span><span class="p">,</span> <span class="n">modules_wide</span><span class="p">,</span>
+                                  <span class="n">number_of_rows</span><span class="p">,</span> <span class="n">tables_removed_for_pcs</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the number of tables (mounting structures) across per row of a DC field. Rounds the result up to</span>
+<span class="sd">        the nearest next integer (ceiling function), as would be done automatically in the backend of PlantPredict.</span>
+
+<span class="sd">        :param float field_dc_power: DC capacity of the DC field. Must be between :py:data:`1` and :py:data:`20000` -</span>
+<span class="sd">                                     units `[kW]`.</span>
+<span class="sd">        :param float planned_module_rating: Nameplate rating of each individual module in the DC field. Must be between</span>
+<span class="sd">                                            :py:data:`10` and :py:data:`1000` - units `[W]`.</span>
+<span class="sd">        :param int modules_high: Number of modules high per table (number of ranks). Must be between :py:data:`1` and</span>
+<span class="sd">                                 :py:data:`50`.</span>
+<span class="sd">        :param int modules_wide: Number of modules across per table. Must be between :py:data:`1` and :py:data:`100`.</span>
+<span class="sd">        :param int number_of_rows: Number of rows of tables in DC field. Must be between :py:data:`1` and</span>
+<span class="sd">                                   :py:data:`10000`.</span>
+<span class="sd">        :param float tables_removed_for_pcs: Number of tables removed in DC field to make room for its power</span>
+<span class="sd">                                             conditioning system (PCS). Must be between :py:data:`0` and :py:data:`50`.</span>
+<span class="sd">                                             Defaults to :py:data:`0`.</span>
+<span class="sd">        :return: Number of tables across per row of DC field.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">module_count</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">*</span><span class="n">field_dc_power</span> <span class="o">/</span> <span class="n">planned_module_rating</span>
+        <span class="n">modules_per_table</span> <span class="o">=</span> <span class="n">modules_high</span> <span class="o">*</span> <span class="n">modules_wide</span>            <span class="c1"># note: only a frontend value</span>
+        <span class="n">total_tables</span> <span class="o">=</span> <span class="n">module_count</span> <span class="o">/</span> <span class="n">modules_per_table</span>            <span class="c1"># note: only a frontend value</span>
+        <span class="n">tables_per_row</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_tables</span> <span class="o">+</span> <span class="n">tables_removed_for_pcs</span><span class="p">)</span> <span class="o">/</span> <span class="n">number_of_rows</span>
+
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">tables_per_row</span><span class="p">)</span>    <span class="c1"># rounds up to next greater integer</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_dc_field_size_by_collector_bandwidth</span><span class="p">(</span><span class="n">number_of_rows</span><span class="p">,</span> <span class="n">post_to_post_spacing</span><span class="p">,</span> <span class="n">collector_bandwidth</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the DC field dimension from the front of the first table to the back of the last table (the first</span>
+<span class="sd">        row to the last row).</span>
+
+<span class="sd">        :param int number_of_rows: Number of rows of tables in DC field. Must be between :py:data:`1` and</span>
+<span class="sd">                                     :py:data:`10000`.</span>
+<span class="sd">        :param float post_to_post_spacing: Row spacing. Must be between :py:data:`0.0` and :py:data:`50.0` - units</span>
+<span class="sd">                                           :py:data:`[m]`.</span>
+<span class="sd">        :param float collector_bandwidth: The total width/depth of each table/row of modules in the DC field. Must be</span>
+<span class="sd">                                          between :py:data:`0` and :py:data:`30` - units `[m]`.</span>
+<span class="sd">        :return: Dimension of DC field in the &quot;front to back&quot; direction - units `[m]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">post_to_post_spacing</span><span class="o">*</span><span class="p">(</span><span class="n">number_of_rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">collector_bandwidth</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_dc_field_size_by_tables_per_row</span><span class="p">(</span><span class="n">tables_per_row</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span> <span class="n">module_length</span><span class="p">,</span> <span class="n">module_width</span><span class="p">,</span>
+                                                   <span class="n">lateral_intermodule_gap</span><span class="p">,</span> <span class="n">modules_wide</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the DC field dimension along each row of tables/modules.</span>
+
+<span class="sd">        :param float tables_per_row: Number of tables wide per row in the DC field.</span>
+<span class="sd">        :param int module_orientation: Represents the orientation (portrait or landscape) of modules in the DC field.</span>
+<span class="sd">                                       Use :py:class:`~plantpredict.enumerations.ModuleOrientationEnum`.</span>
+<span class="sd">        :param float module_length: Length of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                    :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float module_width: Width of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                   :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float lateral_intermodule_gap: Lateral gap between each module on the mounting structure. Must be between</span>
+<span class="sd">                                              :py:data:`0` and py:data:`1` - units `[m]&#39;.</span>
+<span class="sd">        :param int modules_wide: Number of modules across per table. Must be between :py:data:`1` and :py:data:`100`.</span>
+<span class="sd">        :return: Dimension of DC field in the &quot;side to side&quot; direction - units `[m]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">module_size</span> <span class="o">=</span> <span class="n">module_length</span> <span class="o">/</span> <span class="mf">1000.0</span> <span class="k">if</span> <span class="n">module_orientation</span> <span class="o">==</span> <span class="n">ModuleOrientationEnum</span><span class="o">.</span><span class="n">LANDSCAPE</span> \
+            <span class="k">else</span> <span class="n">module_width</span> <span class="o">/</span> <span class="mf">1000.0</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">modules_wide</span> <span class="o">*</span> <span class="n">tables_per_row</span> <span class="o">*</span> <span class="p">(</span><span class="n">module_size</span> <span class="o">+</span> <span class="n">lateral_intermodule_gap</span><span class="p">))</span> <span class="o">-</span> <span class="n">lateral_intermodule_gap</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_dc_field_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tables_per_row</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span> <span class="n">module_length</span><span class="p">,</span> <span class="n">module_width</span><span class="p">,</span>
+                                   <span class="n">lateral_intermodule_gap</span><span class="p">,</span> <span class="n">modules_wide</span><span class="p">,</span> <span class="n">tracking_type</span><span class="p">,</span> <span class="n">number_of_rows</span><span class="p">,</span>
+                                   <span class="n">post_to_post_spacing</span><span class="p">,</span> <span class="n">collector_bandwidth</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the DC field length dimension, which is the &quot;side to side&quot; dimension across each row for a horizontal</span>
+<span class="sd">        tracker array, and the &quot;front to back&quot; dimension from the front row to the back row of tables for a fixed tilt</span>
+<span class="sd">        array.</span>
+
+<span class="sd">        :param int tables_per_row: Number of tables wide per row in the DC field.</span>
+<span class="sd">        :param int module_orientation: Represents the orientation (portrait or landscape) of modules in the DC field.</span>
+<span class="sd">                                       Use :py:class:`~plantpredict.enumerations.ModuleOrientationEnum`.</span>
+<span class="sd">        :param float module_length: Length of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                    :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float module_width: Width of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                   :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float lateral_intermodule_gap: Lateral gap between each module on the mounting structure. Must be between</span>
+<span class="sd">                                              :py:data:`0` and py:data:`1` - units `[m]&#39;.</span>
+<span class="sd">        :param int modules_wide: Number of modules across per table. Must be between :py:data:`1` and :py:data:`100`.</span>
+<span class="sd">        :param int tracking_type: Represents the tracking type/mounting structure (Fixed Tilt, Tracker, etc.) of the DC</span>
+<span class="sd">                                  field. Use :py:class:`~plantpredict.enumerations.TrackingTypeEnum`.</span>
+<span class="sd">        :param int number_of_rows: Number of rows of tables in DC field. Must be between :py:data:`1` and</span>
+<span class="sd">                                     :py:data:`10000`.</span>
+<span class="sd">        :param float post_to_post_spacing: Row spacing. Must be between :py:data:`0.0` and :py:data:`50.0` - units</span>
+<span class="sd">                                           :py:data:`[m]`.</span>
+<span class="sd">        :param float collector_bandwidth: The total width/depth of each table/row of modules in the DC field. Must be</span>
+<span class="sd">                                          between :py:data:`0` and :py:data:`30` - units `[m]`.</span>
+<span class="sd">        :return: DC field length - units py:data:`[m]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tracking_type</span> <span class="o">==</span> <span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">HORIZONTAL_TRACKER</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_dc_field_size_by_tables_per_row</span><span class="p">(</span><span class="n">tables_per_row</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span> <span class="n">module_length</span><span class="p">,</span>
+                                                                   <span class="n">module_width</span><span class="p">,</span> <span class="n">lateral_intermodule_gap</span><span class="p">,</span> <span class="n">modules_wide</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_dc_field_size_by_collector_bandwidth</span><span class="p">(</span><span class="n">number_of_rows</span><span class="p">,</span> <span class="n">post_to_post_spacing</span><span class="p">,</span>
+                                                                    <span class="n">collector_bandwidth</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_dc_field_width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tracking_type</span><span class="p">,</span> <span class="n">number_of_rows</span><span class="p">,</span> <span class="n">post_to_post_spacing</span><span class="p">,</span> <span class="n">collector_bandwidth</span><span class="p">,</span>
+                                  <span class="n">tables_per_row</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span> <span class="n">module_length</span><span class="p">,</span> <span class="n">module_width</span><span class="p">,</span>
+                                  <span class="n">lateral_intermodule_gap</span><span class="p">,</span> <span class="n">modules_wide</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the DC field width dimension, which is the &quot;side to side&quot; dimension across each row for a horizontal</span>
+<span class="sd">        fixed tilt array, and the &quot;front to back&quot; dimension from the front row to the back row of tables for a tracker</span>
+<span class="sd">        array.</span>
+
+<span class="sd">        :param int tracking_type: Represents the tracking type/mounting structure (Fixed Tilt, Tracker, etc.) of the DC</span>
+<span class="sd">                                  field. Use :py:class:`~plantpredict.enumerations.TrackingTypeEnum`.</span>
+<span class="sd">        :param int number_of_rows: Number of rows of tables in DC field. Must be between :py:data:`1` and</span>
+<span class="sd">                                     :py:data:`10000`.</span>
+<span class="sd">        :param float post_to_post_spacing: Row spacing. Must be between :py:data:`0.0` and :py:data:`50.0` - units</span>
+<span class="sd">                                           :py:data:`[m]`.</span>
+<span class="sd">        :param float collector_bandwidth: The total width/depth of each table/row of modules in the DC field. Must be</span>
+<span class="sd">                                          between :py:data:`0` and :py:data:`30` - units `[m]`.</span>
+<span class="sd">        :param int tables_per_row: Number of tables wide per row in the DC field.</span>
+<span class="sd">        :param int module_orientation: Represents the orientation (portrait or landscape) of modules in the DC field.</span>
+<span class="sd">                                       Use :py:class:`~plantpredict.enumerations.ModuleOrientationEnum`.</span>
+<span class="sd">        :param float module_length: Length of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                    :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float module_width: Width of each individual module in DC field. Must be between :py:data:`0` and</span>
+<span class="sd">                                   :py:data:`10000` - units `[mm]`.</span>
+<span class="sd">        :param float lateral_intermodule_gap: Lateral gap between each module on the mounting structure. Must be between</span>
+<span class="sd">                                              :py:data:`0` and py:data:`1` - units `[m]&#39;.</span>
+<span class="sd">        :param int modules_wide: Number of modules across per table. Must be between :py:data:`1` and</span>
+<span class="sd">                                       :py:data:`100`.</span>
+<span class="sd">        :return: DC field width - units :py:data:`[m]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tracking_type</span> <span class="o">==</span> <span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">HORIZONTAL_TRACKER</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_dc_field_size_by_collector_bandwidth</span><span class="p">(</span><span class="n">number_of_rows</span><span class="p">,</span> <span class="n">post_to_post_spacing</span><span class="p">,</span>
+                                                                        <span class="n">collector_bandwidth</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_dc_field_size_by_tables_per_row</span><span class="p">(</span><span class="n">tables_per_row</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span> <span class="n">module_length</span><span class="p">,</span>
+                                                               <span class="n">module_width</span><span class="p">,</span> <span class="n">lateral_intermodule_gap</span><span class="p">,</span> <span class="n">modules_wide</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_validate_dc_field_sizing</span><span class="p">(</span><span class="n">field_dc_power</span><span class="p">,</span> <span class="n">number_of_series_strings_wired_in_parallel</span><span class="p">,</span> <span class="n">planned_module_rating</span><span class="p">,</span>
+                                  <span class="n">modules_wired_in_series</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates equivalent number of strings in parallel for a given DC capacity, or calculates an equivalent DC</span>
+<span class="sd">        capacity for a given number of strings in parallel for the DC field. Returns both the provided and calculated</span>
+<span class="sd">        values.</span>
+
+<span class="sd">        :param float, None field_dc_power: DC capacity of the DC field. Must be `None` if</span>
+<span class="sd">                                           `number_of_seres_strings_wired_in_parallel` is not `None`, otherwise must be</span>
+<span class="sd">                                           between :py:data:`1` and :py:data:`20000` - units `[kW]`.</span>
+<span class="sd">        :param float, None number_of_series_strings_wired_in_parallel: Number of strings of modules electrically</span>
+<span class="sd">                                                                       connected in parallel in the DC field. Must be</span>
+<span class="sd">                                                                       `None` if `field_dc_power` is not `None`,</span>
+<span class="sd">                                                                       otherwise must be between :py:data:`1` and</span>
+<span class="sd">                                                                       :py:data`10000`.</span>
+<span class="sd">        :param float planned_module_rating: Nameplate rating of each individual module in the DC field. Must be between</span>
+<span class="sd">                                            :py:data:`10` and :py:data:`1000` - units `[W]`.</span>
+<span class="sd">        :param int modules_wired_in_series: The number of modules electrically connected in series in a string. Must be</span>
+<span class="sd">                                            be between :py:data:`1` and :py:data:`100`.</span>
+<span class="sd">        :raises ValueError: Raised if both `field_dc_power` and `number_of_series_strings_wired_in_parallel` are `None`</span>
+<span class="sd">                            or are both not `None`.</span>
+<span class="sd">        :return: Field DC Power (units `[kW]`) and equivalent number of series strings wired in parallel in DC field.</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">field_dc_power</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">number_of_series_strings_wired_in_parallel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both field_dc_power and number_of_series_strings_wired_in_parallel are not None. Only &quot;</span>
+                             <span class="s2">&quot;one of these values can be specified (and the other will be calculated).&quot;</span><span class="p">)</span>
+
+        <span class="c1"># calculates number of strings from field dc power if field dc power specified</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">field_dc_power</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">number_of_series_strings_wired_in_parallel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">number_of_series_strings_wired_in_parallel</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">field_dc_power</span> <span class="o">/</span> \
+                                                         <span class="p">(</span><span class="n">planned_module_rating</span> <span class="o">*</span> <span class="n">modules_wired_in_series</span><span class="p">)</span>
+
+        <span class="c1"># calculates field dc power from number of strings if number of strings specified</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">number_of_series_strings_wired_in_parallel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">field_dc_power</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">field_dc_power</span> <span class="o">=</span> <span class="n">number_of_series_strings_wired_in_parallel</span> <span class="o">*</span> \
+                             <span class="p">(</span><span class="n">planned_module_rating</span> <span class="o">*</span> <span class="n">modules_wired_in_series</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both field_dc_power and number_of_series_strings_wired_in_parallel are None. One &quot;</span>
+                             <span class="s2">&quot;of these variables must be specified, and the other will be calculated.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">field_dc_power</span><span class="p">,</span> <span class="n">number_of_series_strings_wired_in_parallel</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">calculate_post_to_post_spacing_from_gcr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ground_coverage_ratio</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">modules_high</span><span class="p">,</span>
+                                                <span class="n">module_orientation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical_intermodule_gap</span><span class="o">=</span><span class="mf">0.02</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Useful helper method for calculating :py:attr:`post_to_post_spacing` based on a desired ground coverage ratio</span>
+<span class="sd">        (GCR). :py:attr:`post_to_post_spacing` is a required input for</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.add_dc_field`.</span>
+
+<span class="sd">        :param float ground_coverage_ratio: Ratio of collector bandwidth to row spacing - units :py:data:`[decimal]`.</span>
+<span class="sd">        :param int module_id: Unique identifier of the module to be used in the DC field.</span>
+<span class="sd">        :param int modules_high: Number of modules high per table (number of ranks). Must be between :py:data:`1` and</span>
+<span class="sd">                                 :py:data:`50`.</span>
+<span class="sd">        :param module_orientation: Represents the orientation (portrait or landscape) of modules in the DC field. If</span>
+<span class="sd">                                   left as default (:py:data:`None`), is automatically set as the</span>
+<span class="sd">                                   :py:attr:`module_orientation` of the module model specified by :py:data:`module_id`.</span>
+<span class="sd">                                   Use :py:class:`~plantpredict.enumerations.ModuleOrientationEnum`.</span>
+<span class="sd">        :type module_orientation: int, None</span>
+<span class="sd">        :param float vertical_intermodule_gap: Vertical gap between each module on the mounting structure. Defaults to</span>
+<span class="sd">                                               :py:data:`0.02`. Must be between :py:data:`0` and py:data:`1` - units</span>
+<span class="sd">                                               :py:data:`[m]&#39;.</span>
+<span class="sd">        :return: Post to post spacing (row spacing) of DC field - units :py:data:`[m]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">module_id</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="n">collector_bandwidth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_collector_bandwidth</span><span class="p">(</span>
+            <span class="n">module_width</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">module_length</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
+            <span class="n">module_orientation</span><span class="o">=</span><span class="n">module_orientation</span> <span class="k">if</span> <span class="n">module_orientation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">default_orientation</span><span class="p">,</span>
+            <span class="n">modules_high</span><span class="o">=</span><span class="n">modules_high</span><span class="p">,</span>
+            <span class="n">vertical_intermodule_gap</span><span class="o">=</span><span class="n">vertical_intermodule_gap</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">collector_bandwidth</span> <span class="o">/</span> <span class="n">ground_coverage_ratio</span>
+
+<div class="viewcode-block" id="PowerPlant.calculate_field_dc_power_from_dc_ac_ratio">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.powerplant.PowerPlant.calculate_field_dc_power_from_dc_ac_ratio">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calculate_field_dc_power_from_dc_ac_ratio</span><span class="p">(</span><span class="n">dc_ac_ratio</span><span class="p">,</span> <span class="n">inverter_setpoint</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Useful helper method for sizing the DC field capacity (:py:attr:`field_dc_power`) based on a desired DC AC ratio</span>
+<span class="sd">        and known inverter setpoint. :py:attr:`field_dc_power` is a required input for</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.add_dc_field`.</span>
+
+<span class="sd">        :param float dc_ac_ratio: Ratio of DC capacity of DC field to the AC capacity/inverter setpoint.</span>
+<span class="sd">        :param float inverter_setpoint: Setpoint of parent inverter to the DC field. Can be found with key</span>
+<span class="sd">                                        :py:data:`setpoint_kw` in the dictionary representing the inverter. Must be</span>
+<span class="sd">                                        between :py:data:`1` and :py:data:`10000` - units :py:data:`[kW]`.</span>
+<span class="sd">        :return: DC capacity for a DC field - units :py:data:`[kW]`.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dc_ac_ratio</span><span class="o">*</span><span class="n">inverter_setpoint</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_validate_mounting_structure_parameters</span><span class="p">(</span><span class="n">tracking_type</span><span class="p">,</span> <span class="n">module_tilt</span><span class="p">,</span> <span class="n">tracking_backtracking_type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures that if the DC field uses a fixed tilt mounting structure, that a tilt angle is provided, and if it</span>
+<span class="sd">        uses a horizontal tracker mounting structure, that a backtracking type is provided.</span>
+
+<span class="sd">        :param int tracking_type: Represents the tracking type/mounting structure (Fixed Tilt, Tracker, etc.) of the DC</span>
+<span class="sd">                                  field. Use :py:class:`~plantpredict.enumerations.TrackingTypeEnum`.</span>
+<span class="sd">        :param module_tilt: Tilt angle of modules in DC Field for a fixed tilt array. Must be between :py:data:`0` and</span>
+<span class="sd">                            :py:data:`90` - units `[degrees]`.</span>
+<span class="sd">        :type module_tilt: float, None</span>
+<span class="sd">        :param tracking_backtracking_type: Represents the backtracking algorithm (True-Tracking or Backtracking) used in</span>
+<span class="sd">                                           DC Field. Use :py:class:`~plantpredict.enumerations.BacktrackingTypeEnum`.</span>
+<span class="sd">        :type tracking_backtracking_type: int, None</span>
+<span class="sd">        :raises ValueError: Raised if the `tracking_type` is</span>
+<span class="sd">                            :py:attr:`~plantpredict.enumerations.TrackingTypeEnum.FIXED_TILT` and `module_tilt` is</span>
+<span class="sd">                            `None`, or if `tracking_type` is</span>
+<span class="sd">                            `~plantpredict.enumerations.TrackingTypeEnum.HORIZONTAL_TRACKER` and</span>
+<span class="sd">                            `tracking_backtracking_type` is `None`.</span>
+<span class="sd">]        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">tracking_type</span> <span class="o">==</span> <span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">FIXED_TILT</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">module_tilt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The input module_tilt is required for a fixed tilt DC field.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">tracking_type</span> <span class="o">==</span> <span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">HORIZONTAL_TRACKER</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">tracking_backtracking_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The input tracking_backtracking_type is required for a horizontal tracker DC field.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_default_post_height</span><span class="p">(</span><span class="n">tracking_type</span><span class="p">,</span> <span class="n">collector_bandwidth</span><span class="p">,</span> <span class="n">module_tilt</span><span class="p">,</span> <span class="n">minimum_tracking_limit_angle_d</span><span class="p">,</span>
+                                       <span class="n">maximum_tracking_limit_angle_d</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        First calculates a default post height value. Then, the maximum of the calculated post height and 1.5 is</span>
+<span class="sd">        returned.</span>
+
+<span class="sd">        :param int tracking_type: Represents the tracking type/mounting structure (Fixed Tilt or Tracker) of the DC</span>
+<span class="sd">                                  field. Use :py:class:`~plantpredict.enumerations.TrackingTypeEnum`. (Seasonal Tilt</span>
+<span class="sd">                                  currently not supported in this package).</span>
+<span class="sd">        :param float collector_bandwidth: The total width/depth of each table/row of modules in the DC field. Must be</span>
+<span class="sd">                                          between :py:data:`0` and :py:data:`30` - units `[m]`.</span>
+<span class="sd">        :param float, None module_tilt: Tilt angle of modules in DC Field for a fixed tilt array. Defaults to `None`.</span>
+<span class="sd">                                        Non-null value required required if :py:data:`tracking_type` is equal to</span>
+<span class="sd">                                        :py:attr:`~plantpredict.enumerations.TrackingTypeEnum.FIXED_TILT`, and must be</span>
+<span class="sd">                                        between :py:data:`0` and :py:data:`90` - units `[degrees]`.</span>
+<span class="sd">        :param float minimum_tracking_limit_angle_d: Minimum tracking angle for horizontal tracker array. Defaults to</span>
+<span class="sd">                                                     :py:data:`-60.0`. Must be between :py:data:`-90` and :py:data:`0` -</span>
+<span class="sd">                                                     units `[degrees]`.</span>
+<span class="sd">        :param float maximum_tracking_limit_angle_d: Maximum tracking angle for horizontal tracker array. Defaults to</span>
+<span class="sd">                                                     :py:data:`60.0`. Must be between :py:data:`0` and :py:data:`90` -</span>
+<span class="sd">                                                     units `[degrees]`.</span>
+<span class="sd">        :return: Default post height value.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tilt</span> <span class="o">=</span> <span class="n">module_tilt</span> <span class="k">if</span> <span class="n">tracking_type</span> <span class="o">==</span> <span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">FIXED_TILT</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">minimum_tracking_limit_angle_d</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">maximum_tracking_limit_angle_d</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">post_height</span> <span class="o">=</span> <span class="p">((</span><span class="n">collector_bandwidth</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">tilt</span><span class="p">)))</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">post_height</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_modules_wide</span><span class="p">(</span><span class="n">strings_wide</span><span class="p">,</span> <span class="n">modules_wired_in_series</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates number of modules wide across table by multiplying the number of strings wide and modules per string.</span>
+
+<span class="sd">        :param int strings_wide: Number of strings across per table. Multiplied by :py:data:`modules_wired_in_series` to</span>
+<span class="sd">                                 determine :py:attr:`modules_wide`. Must result in :py:attr:`modules_wide` between</span>
+<span class="sd">                                 :py:data:`1` and  :py:data:`100`. Defaults to :py:data:`1`.</span>
+<span class="sd">        :param int modules_wired_in_series: The number of modules electrically connected in series in a string.</span>
+<span class="sd">        :return: Modules wide across per table.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">strings_wide</span> <span class="o">*</span> <span class="n">modules_wired_in_series</span>
+
+    <span class="nd">@handle_refused_connection</span>
+    <span class="nd">@handle_error_response</span>
+    <span class="k">def</span> <span class="nf">add_dc_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">array_name</span><span class="p">,</span> <span class="n">inverter_name</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">tracking_type</span><span class="p">,</span> <span class="n">modules_high</span><span class="p">,</span>
+                     <span class="n">modules_wired_in_series</span><span class="p">,</span> <span class="n">post_to_post_spacing</span><span class="p">,</span> <span class="n">number_of_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">strings_wide</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                     <span class="n">field_dc_power</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">number_of_series_strings_wired_in_parallel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module_tilt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">module_orientation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module_azimuth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracking_backtracking_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">minimum_tracking_limit_angle_d</span><span class="o">=-</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">maximum_tracking_limit_angle_d</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span>
+                     <span class="n">lateral_intermodule_gap</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">vertical_intermodule_gap</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">table_to_table_spacing</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                     <span class="n">module_quality</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module_mismatch_coefficient</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">light_induced_degradation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">dc_wiring_loss_at_stc</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">dc_health</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">heat_balance_conductive_coef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">heat_balance_convective_coef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sandia_conductive_coef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sandia_convective_coef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">cell_to_module_temp_diff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracker_load_loss</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">post_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">structure_shading</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                     <span class="n">backside_mismatch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A &quot;power plant builder&quot; helper method that adds a DC field to an inverter specified by :py:data:`inverter_name`,</span>
+<span class="sd">        which is a child of the array  :py:data:`array_name`, which is a child of a block specified by</span>
+<span class="sd">        :py:data:`block_name` on the :py:class:`~plantpredict.powerplant.PowerPlant`. DC field naming is sequential</span>
+<span class="sd">        (numerically) - for instance, if there are 2 existing DC fields with names :py:data:`1` and :py:data:`2`</span>
+<span class="sd">        (accessible via key :py:data:`name` for a given DC field dictionary), the next array created by</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.add_dc_field` will automatically have :py:data:`name` equal to</span>
+<span class="sd">        :py:data:`3`. This method does not currently account for the situation in which an existing power plant has</span>
+<span class="sd">        DC fields named non-sequentially.</span>
+
+<span class="sd">        Note that this addition is not persisted to PlantPredict unless</span>
+<span class="sd">        :py:meth:`~plantpredict.powerplant.PowerPlant.update` is subsequently called.</span>
+
+<span class="sd">        :param int block_name: Name (1-indexed integer) of the parent block to add DC field to. Can be found in the</span>
+<span class="sd">                               relevant block dictionary (in attribute :py:attr:`blocks`) with key :py:data:`id`. This</span>
+<span class="sd">                               value is returned for a new block when you create one with</span>
+<span class="sd">                               :py:meth:`~plantpredict.powerplant.PowerPlant.add_block`. Must be between :py:data:`1`</span>
+<span class="sd">                               and :py:data:`99`.</span>
+<span class="sd">        :param int array_name: Name (1-indexed integer) of the parent array to add DC field to. This value is</span>
+<span class="sd">                               returned for a new array when you create one with</span>
+<span class="sd">                               :py:meth:`~plantpredict.powerplant.PowerPlant.add_array`. Must be between :py:data:`1`</span>
+<span class="sd">                               and :py:data:`99`.</span>
+<span class="sd">        :param str inverter_name: Name (letter) of the parent array to add the DC field to. This value is returned for</span>
+<span class="sd">                                  a new array when you create one with</span>
+<span class="sd">                                  :py:meth:`~plantpredict.powerplant.PowerPlant.add_inverter`. Must be only 1</span>
+<span class="sd">                                  character.</span>
+<span class="sd">        :param int module_id: Unique identifier of the module to be used in the DC field.</span>
+<span class="sd">        :param int tracking_type: Represents the tracking type/mounting structure (Fixed Tilt or Tracker) of the DC</span>
+<span class="sd">                                  field. Use :py:class:`~plantpredict.enumerations.TrackingTypeEnum`. (Seasonal Tilt</span>
+<span class="sd">                                  currently not supported in this package).</span>
+<span class="sd">        :param int modules_high: Number of modules high per table (number of ranks). Must be between :py:data:`1` and</span>
+<span class="sd">                                 :py:data:`50`.</span>
+<span class="sd">        :param int modules_wired_in_series: The number of modules electrically connected in series in a string.</span>
+<span class="sd">        :param float post_to_post_spacing: Row spacing. Must be between :py:data:`0.0` and :py:data:`50.0` - units</span>
+<span class="sd">                                           :py:data:`[m]`.</span>
+<span class="sd">        :param number_of_rows: Number of rows of tables in DC field. Must be between :py:data:`1` and</span>
+<span class="sd">                               :py:data:`10000`. Defaults to :py:data:`1`.</span>
+<span class="sd">        :type number_of_rows: int, None</span>
+<span class="sd">        :param int strings_wide: Number of strings across per table. Multiplied by :py:data:`modules_wired_in_series` to</span>
+<span class="sd">                                 determine :py:attr:`modules_wide`. Must result in :py:attr:`modules_wide` between</span>
+<span class="sd">                                 :py:data:`1` and  :py:data:`100`. Defaults to :py:data:`1`.</span>
+<span class="sd">        :param field_dc_power: DC capacity of the DC field. Defaults to `None`. Non-null value required if</span>
+<span class="sd">                               :py:data:`number_of_series_strings_wired_in_parallel` is `None` and  must be between</span>
+<span class="sd">                               :py:data:`1` and :py:data:`20000` - units :py:data:`[kW]`.</span>
+<span class="sd">        :type field_dc_power: float, None</span>
+<span class="sd">        :param number_of_series_strings_wired_in_parallel: Number of strings of modules electrically connected in</span>
+<span class="sd">                                                           parallel in the DC field. Defaults to :py:data:`None`.</span>
+<span class="sd">                                                           Non-null value required if :py:data:`field_dc_power` is</span>
+<span class="sd">                                                           :py:data:`None`, and must be between :py:data:`1` and</span>
+<span class="sd">                                                           :py:data`10000`.</span>
+<span class="sd">        :type number_of_series_strings_wired_in_parallel: float, None</span>
+<span class="sd">        :param module_tilt: Tilt angle of modules in DC Field for a fixed tilt array. Defaults to :py:data:`None`.</span>
+<span class="sd">                            Non-null value required required if :py:data:`tracking_type` is equal to</span>
+<span class="sd">                            :py:attr:`~plantpredict.enumerations.TrackingTypeEnum.FIXED_TILT`, and must be between</span>
+<span class="sd">                            :py:data:`0` and :py:data:`90` - units :py:data:`[degrees]`.</span>
+<span class="sd">        :type module_tilt: float, None</span>
+<span class="sd">        :param module_orientation: Represents the orientation (portrait or landscape) of modules in the DC field. If</span>
+<span class="sd">                                   left as default (:py:data:`None`), is automatically set as the</span>
+<span class="sd">                                   :py:attr:`module_orientation` of the module model specified by :py:data:`module_id`.</span>
+<span class="sd">                                   Use :py:class:`~plantpredict.enumerations.ModuleOrientationEnum`.</span>
+<span class="sd">        :type module_orientation: int, None</span>
+<span class="sd">        :param module_azimuth: Orientation of the entire DC field. The convention is :py:data:`0.0` degrees for</span>
+<span class="sd">                               North-facing arrays. If left as default (:py:data:`None`), is set to :py:data:`180.0`.</span>
+<span class="sd">                               Must be between :py:data:`0` and :py:data:`360` - units :py:data:`[degrees]`.</span>
+<span class="sd">        :type module_azimuth: float, None</span>
+<span class="sd">        :param tracking_backtracking_type: Represents the backtracking algorithm (True-Tracking or Backtracking) used in</span>
+<span class="sd">                                           DC Field. Use :py:class:`~plantpredict.enumerations.BacktrackingTypeEnum`.</span>
+<span class="sd">        :type tracking_backtracking_type: int, None</span>
+<span class="sd">        :param float minimum_tracking_limit_angle_d: Minimum tracking angle for horizontal tracker array. Defaults to</span>
+<span class="sd">                                                     :py:data:`-60.0`. Must be between :py:data:`-90` and :py:data:`0` -</span>
+<span class="sd">                                                     units :py:data:`[degrees]`.</span>
+<span class="sd">        :param float maximum_tracking_limit_angle_d: Maximum tracking angle for horizontal tracker array. Defaults to</span>
+<span class="sd">                                                     :py:data:`60.0`. Must be between :py:data:`0` and :py:data:`90` -</span>
+<span class="sd">                                                     units :py:data:`[degrees]`.</span>
+<span class="sd">        :param float lateral_intermodule_gap: Lateral gap between each module on the mounting structure. Defaults to</span>
+<span class="sd">                                              :py:data:`0.02`. Must be between :py:data:`0` and py:data:`1` - units :py:data:`[m]&#39;.</span>
+<span class="sd">        :param float vertical_intermodule_gap: Vertical gap between each module on the mounting structure. Defaults to</span>
+<span class="sd">                                               :py:data:`0.02`. Must be between :py:data:`0` and py:data:`1` - units</span>
+<span class="sd">                                               :py:data:`[m]&#39;.</span>
+<span class="sd">        :param float table_to_table_spacing: Space between tables in each row. Defaults to :py:data:`0.0`. Must be</span>
+<span class="sd">                                             between :py:data:`0` and :py:data:`50`.</span>
+<span class="sd">        :param module_quality: Accounts for any discrepancy between manufacturer nameplate rating of module and actual</span>
+<span class="sd">                               performance. If left as default (:py:data:`None`), is automatically set as the</span>
+<span class="sd">                               :py:attr:`module_quality` of the module model specified by :py:data:`module_id`. Must be</span>
+<span class="sd">                               between :py:data:`-200` and :py:data:`99` - units :py:data:`[%]`.</span>
+<span class="sd">        :type module_quality: float, None</span>
+<span class="sd">        :param module_mismatch_coefficient: Accounts for losses due to mismatch in electrical characteristics among</span>
+<span class="sd">                                            modules in the strings of the DC fields (and between strings in the DC</span>
+<span class="sd">                                            field). If left as default (:py:data:`None`), is automatically set as the</span>
+<span class="sd">                                            :py:attr:`module_mismatch_coefficient` of the module model specified by</span>
+<span class="sd">                                            :py:data:`module_id`. Must be between :py:data:`0` and :py:data:`30` -</span>
+<span class="sd">                                            units :py:data:`[%]`.</span>
+<span class="sd">        :type module_mismatch_coefficient: float, None</span>
+<span class="sd">        :param light_induced_degradation: Accounts for losses due to light induced degradation. If left as default</span>
+<span class="sd">                                          (:py:data:`None`), is automatically set as the</span>
+<span class="sd">                                          :py:attr:`light_induced_degradation` of the module model specified by</span>
+<span class="sd">                                          :py:data:`module_id`. Must be between :py:data:`0` and :py:data:`30` - units</span>
+<span class="sd">                                          :py:data:`[%]`.</span>
+<span class="sd">        :type light_induced_degradation: float, None</span>
+<span class="sd">        :param float dc_wiring_loss_at_stc: Accounts for losses across all electrical wiring in the DC field. Defaults</span>
+<span class="sd">                                            to :py:data:`1.5`. Must be between :py:data:`0` and :py:data:`30` - units</span>
+<span class="sd">                                            :py:data:`[%]`.</span>
+<span class="sd">        :param float dc_health: Accounts for any losses related to DC health. Defaults to :py:data:`1.0`. Must be</span>
+<span class="sd">                                between :py:data:`-10` and :py:data:`10` - units :py:data:`[%]`.</span>
+<span class="sd">        :param heat_balance_conductive_coef: Thermal loss factor (constant component) of heat balance module surface</span>
+<span class="sd">                                             temperature model. If left as default (:py:data:`None`), is automatically</span>
+<span class="sd">                                             set as the :py:attr:`heat_balance_conductive_coef` of the module model</span>
+<span class="sd">                                             specified by :py:data:`module_id`. Must be between :py:data:`0` and</span>
+<span class="sd">                                             :py:data:`100`. This value is only used if :py:attr:`model_temp_model` is</span>
+<span class="sd">                                             set to</span>
+<span class="sd">                                             :py:attr:`~plantpredict.enumerations.ModuleTemperatureModelEnum.HEAT_BALANCE`</span>
+<span class="sd">                                             for the :py:class:`~plantpredict.prediction.Prediction` associated with the</span>
+<span class="sd">                                             power plant by the attributes :py:attr:`project_id` and</span>
+<span class="sd">                                             :py:attr:`prediction_id`.</span>
+<span class="sd">        :type heat_balance_conductive_coef: float, None</span>
+<span class="sd">        :param heat_balance_convective_coef: Thermal loss factor (wind speed component) of heat balance module surface</span>
+<span class="sd">                                             temperature model. If left as default (:py:data:`None`), is automatically</span>
+<span class="sd">                                             set as the :py:attr:`heat_balance_convective_coef` of the module model</span>
+<span class="sd">                                             specified by :py:data:`module_id`. Must be between :py:data:`0` and</span>
+<span class="sd">                                             :py:data:`100`. This value is only used if :py:attr:`model_temp_model` is</span>
+<span class="sd">                                             set to</span>
+<span class="sd">                                             :py:attr:`~plantpredict.enumerations.ModuleTemperatureModelEnum.HEAT_BALANCE`</span>
+<span class="sd">                                             for the :py:class:`~plantpredict.prediction.Prediction` associated with the</span>
+<span class="sd">                                             power plant by the attributes :py:attr:`project_id` and</span>
+<span class="sd">                                             :py:attr:`prediction_id`.</span>
+<span class="sd">        :type heat_balance_convective_coef: float, None</span>
+<span class="sd">        :param sandia_conductive_coef: Coefficient :py:data:`a` for the Sandia module surface temperature model. If left</span>
+<span class="sd">                                       as default (:py:data:`None`), is automatically set as the</span>
+<span class="sd">                                       :py:attr:`sandia_conductive_coef` of the module model specified by</span>
+<span class="sd">                                       :py:data:`module_id`. Must be between :py:data:`-5` and :py:data:`0`. This value</span>
+<span class="sd">                                       is only used if :py:attr:`model_temp_model` is set to</span>
+<span class="sd">                                       :py:attr:`~plantpredict.enumerations.ModuleTemperatureModelEnum.SANDIA` for the</span>
+<span class="sd">                                       :py:class:`~plantpredict.prediction.Prediction` associated with the power plant</span>
+<span class="sd">                                       by attributes :py:attr:`project_id` and :py:attr:`prediction_id`.</span>
+<span class="sd">        :type sandia_conductive_coef: float, None</span>
+<span class="sd">        :param sandia_convective_coef: Coefficient :py:data:`b` for the Sandia module surface temperature model. If left</span>
+<span class="sd">                                       as default (:py:data:`None`), is automatically set as the</span>
+<span class="sd">                                       :py:attr:`sandia_convective_coef` of the module model specified by</span>
+<span class="sd">                                       :py:data:`module_id`. Must be between :py:data:`-1` and :py:data:`0`. This value</span>
+<span class="sd">                                       is only used if :py:attr:`model_temp_model` is set to</span>
+<span class="sd">                                       :py:attr:`~plantpredict.enumerations.ModuleTemperatureModelEnum.SANDIA` for the</span>
+<span class="sd">                                       :py:class:`~plantpredict.prediction.Prediction` associated with the power plant</span>
+<span class="sd">                                       by attributes :py:attr:`project_id` and :py:attr:`prediction_id`.</span>
+<span class="sd">        :type sandia_convective_coef: float, None</span>
+<span class="sd">        :param cell_to_module_temp_diff: Difference between surface and cell temperature of modules. If left as default</span>
+<span class="sd">                                         (:py:data:`None`), is automatically set as the</span>
+<span class="sd">                                         :py:attr:`cell_to_module_temp_diff` of the module model specified by</span>
+<span class="sd">                                         :py:data:`module_id`. Must be between :py:data:`0` and :py:data:`15` - units</span>
+<span class="sd">                                         :py:data:`[degrees-C]`.</span>
+<span class="sd">        :type cell_to_module_temp_diff: float, None</span>
+<span class="sd">        :param float tracker_load_loss: Accounts for losses from power use of horizontal tracker system. Defaults to</span>
+<span class="sd">                                        :py:data:`0.0`. Must be between :py:data:`0` and :py:data:`100` - units</span>
+<span class="sd">                                        :py:data:`[%]`.</span>
+<span class="sd">        :param post_height: Height of mounting structure (table) post. Defaults to :py:data:`None`. If left as default</span>
+<span class="sd">                            (:py:data:`None`), automatically calculated as</span>
+<span class="sd">                            :py:data:`((collector_bandwidth * sin(tilt) / 2) + 1`, where :py:data:`tilt` is</span>
+<span class="sd">                            :py:data:`module_tilt` if :py:data:`tracking_type` is</span>
+<span class="sd">                            :py:attr:`~plantpredict.enumerations.TrackingTypeEnum.FIXED_TILT`, or the largest of the</span>
+<span class="sd">                            absolute values of</span>
+<span class="sd">                            :py:data:`maximum_tracking_limit_angle_d`/:py:data:`minimum_tracking_limit_angle_d`</span>
+<span class="sd">                            if :py:data:`tracking_type` is</span>
+<span class="sd">                            :py:attr:`~plantpredict.enumerations.TrackingTypeEnum.HORIZONTAL_TRACKER`. However, if the</span>
+<span class="sd">                            calculated value is less than :py:data:`1.5`, :py:data:`post_height` is defaulted to</span>
+<span class="sd">                            :py:data:`1.5`. Must be between :py:data:`0` and :py:data:`50` - units :py:data:`[m]`. This</span>
+<span class="sd">                            value is only used if the module model specified with :py:data:`module_id` is bifacial.</span>
+<span class="sd">        :type post_height: float, None</span>
+<span class="sd">        :param float structure_shading: Accounts for backside of module losses from structure shading. Defaults to</span>
+<span class="sd">                                        :py:data:`0.0`. Must be between :py:data:`0` and :py:data:`100` - units</span>
+<span class="sd">                                        :py:data:`[%]`. This value is only used if the module model specified with</span>
+<span class="sd">                                        :py:data:`module_id` is bifacial.</span>
+<span class="sd">        :param backside_mismatch: Accounts for losses due to inconsistent backside irradiance among modules in the DC</span>
+<span class="sd">                                  field. Defaults to :py:data:`None`. If left as default (:py:data:`None`), is</span>
+<span class="sd">                                  automatically set as the :py:attr:`module_orientation` of the module model specified</span>
+<span class="sd">                                  by :py:data:`module_id`. Must be between :py:data:`0` and :py:data:`100` - units</span>
+<span class="sd">                                  :py:data:`[%]`. This value is only used if the module model specified with</span>
+<span class="sd">                                  :py:data:`module_id` is bifacial.</span>
+<span class="sd">        :type backside_mismatch: float, None</span>
+<span class="sd">        :raises ValueError: Raised if :py:data:`block_name` is not a valid block name in the existing power plant, or</span>
+<span class="sd">                            if the :py:data:`block_name` is valid but :py:data:`array_name` is not a valid array name</span>
+<span class="sd">                            in the block, or if :py:data:`array_name` is valid but :py:data:`inverter_name` is not a</span>
+<span class="sd">                            valid inverter in the array. Also raised if :py:data:`tracking_type` is</span>
+<span class="sd">                            :py:attr:`~plantpredict.enumerations.TrackingTypeEnum.FIXED_TILT` and :py:data:`module_tilt`</span>
+<span class="sd">                            is :py:data:`None`, or if :py:data:`tracking_type` is</span>
+<span class="sd">                            :py:attr:`~plantpredict.enumerations.TrackingTypeEnum.HORIZONTAL_TRACKER` and</span>
+<span class="sd">                            :py:data:`tracking_backtracking_type` is :py:data:`None`. Also raised if both</span>
+<span class="sd">                            :py:data:`field_dc_power` and :py:data`number_of_series_strings_wired_in_parallel` are</span>
+<span class="sd">                            :py:data:`None` or are both not :py:data:`None`. Also raised if :py:data:`tracking_type` is</span>
+<span class="sd">                            :py:data:`~plantpredict.enumerations.TrackingTypeEnum.SEASONAL_TILT`.</span>
+<span class="sd">        :return: The name of the newly added DC field.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># only fixed tilt and horizontal tracker supported</span>
+        <span class="k">if</span> <span class="n">tracking_type</span> <span class="o">==</span> <span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">SEASONAL_TILT</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Seasonal Tilt is not currently supported by the add_dc_field method.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># validate inputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inverter_name</span><span class="p">(</span><span class="n">block_name</span><span class="o">=</span><span class="n">block_name</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="n">array_name</span><span class="p">,</span> <span class="n">inverter_name</span><span class="o">=</span><span class="n">inverter_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_mounting_structure_parameters</span><span class="p">(</span><span class="n">tracking_type</span><span class="p">,</span> <span class="n">module_tilt</span><span class="p">,</span> <span class="n">tracking_backtracking_type</span><span class="p">)</span>
+
+        <span class="c1"># calculate parameters typically calculated in the UI</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">module_id</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">field_dc_power</span><span class="p">,</span> <span class="n">number_of_series_strings_wired_in_parallel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_dc_field_sizing</span><span class="p">(</span>
+            <span class="n">field_dc_power</span><span class="o">=</span><span class="n">field_dc_power</span><span class="p">,</span>
+            <span class="n">number_of_series_strings_wired_in_parallel</span><span class="o">=</span><span class="n">number_of_series_strings_wired_in_parallel</span><span class="p">,</span>
+            <span class="n">planned_module_rating</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">stc_max_power</span><span class="p">,</span>
+            <span class="n">modules_wired_in_series</span><span class="o">=</span><span class="n">modules_wired_in_series</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">module_orientation</span> <span class="o">=</span> <span class="n">module_orientation</span> <span class="k">if</span> <span class="n">module_orientation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">default_orientation</span>
+        <span class="n">modules_wide</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_modules_wide</span><span class="p">(</span><span class="n">strings_wide</span><span class="p">,</span> <span class="n">modules_wired_in_series</span><span class="p">)</span>
+        <span class="n">collector_bandwidth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_collector_bandwidth</span><span class="p">(</span>
+            <span class="n">module_width</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">module_length</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
+            <span class="n">module_orientation</span><span class="o">=</span><span class="n">module_orientation</span><span class="p">,</span>
+            <span class="n">vertical_intermodule_gap</span><span class="o">=</span><span class="n">vertical_intermodule_gap</span><span class="p">,</span>
+            <span class="n">modules_high</span><span class="o">=</span><span class="n">modules_high</span>
+        <span class="p">)</span>
+        <span class="n">table_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_table_length</span><span class="p">(</span>
+            <span class="n">modules_wide</span><span class="o">=</span><span class="n">modules_wide</span><span class="p">,</span>
+            <span class="n">module_width</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">module_length</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
+            <span class="n">module_orientation</span><span class="o">=</span><span class="n">module_orientation</span><span class="p">,</span>
+            <span class="n">lateral_intermodule_gap</span><span class="o">=</span><span class="n">lateral_intermodule_gap</span>
+        <span class="p">)</span>
+        <span class="n">tables_per_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_tables_per_row</span><span class="p">(</span>
+            <span class="n">field_dc_power</span><span class="o">=</span><span class="n">field_dc_power</span><span class="p">,</span>
+            <span class="n">planned_module_rating</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">stc_max_power</span><span class="p">,</span>
+            <span class="n">modules_high</span><span class="o">=</span><span class="n">modules_high</span><span class="p">,</span>
+            <span class="n">modules_wide</span><span class="o">=</span><span class="n">modules_wide</span><span class="p">,</span>
+            <span class="n">number_of_rows</span><span class="o">=</span><span class="n">number_of_rows</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">][</span><span class="nb">ord</span><span class="p">(</span><span class="n">inverter_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span><span class="p">][</span><span class="s2">&quot;dc_fields&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">][</span>
+                                <span class="nb">ord</span><span class="p">(</span><span class="n">inverter_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span><span class="p">][</span><span class="s2">&quot;dc_fields&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">&quot;module_id&quot;</span><span class="p">:</span> <span class="n">module_id</span><span class="p">,</span>
+                <span class="s2">&quot;tracking_type&quot;</span><span class="p">:</span> <span class="n">tracking_type</span><span class="p">,</span>
+                <span class="s2">&quot;minimum_tracking_limit_angle_d&quot;</span><span class="p">:</span> <span class="n">minimum_tracking_limit_angle_d</span><span class="p">,</span>
+                <span class="s2">&quot;maximum_tracking_limit_angle_d&quot;</span><span class="p">:</span> <span class="n">maximum_tracking_limit_angle_d</span><span class="p">,</span>
+                <span class="s2">&quot;module_orientation&quot;</span><span class="p">:</span> <span class="n">module_orientation</span><span class="p">,</span>
+                <span class="s2">&quot;modules_high&quot;</span><span class="p">:</span> <span class="n">modules_high</span><span class="p">,</span>
+                <span class="s2">&quot;module_azimuth&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">module_azimuth</span> <span class="k">if</span> <span class="n">module_azimuth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                                   <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_module_azimuth_from_latitude</span><span class="p">()),</span>
+                <span class="s2">&quot;collector_bandwidth&quot;</span><span class="p">:</span> <span class="n">collector_bandwidth</span><span class="p">,</span>
+                <span class="s2">&quot;post_to_post_spacing&quot;</span><span class="p">:</span> <span class="n">post_to_post_spacing</span><span class="p">,</span>
+                <span class="c1"># Electrical</span>
+                <span class="s2">&quot;planned_module_rating&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">stc_max_power</span><span class="p">,</span>
+                <span class="s2">&quot;modules_wired_in_series&quot;</span><span class="p">:</span> <span class="n">modules_wired_in_series</span><span class="p">,</span>
+                <span class="s2">&quot;field_dc_power&quot;</span><span class="p">:</span> <span class="n">field_dc_power</span><span class="p">,</span>
+                <span class="s2">&quot;number_of_series_strings_wired_in_parallel&quot;</span><span class="p">:</span> <span class="n">number_of_series_strings_wired_in_parallel</span><span class="p">,</span>
+                <span class="s2">&quot;module_count&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="o">*</span><span class="n">field_dc_power</span><span class="o">/</span><span class="n">m</span><span class="o">.</span><span class="n">stc_max_power</span><span class="p">,</span>    <span class="c1"># confirmed calculation in PlantPredict backend</span>
+                <span class="c1"># Losses</span>
+                <span class="s2">&quot;module_quality&quot;</span><span class="p">:</span> <span class="n">module_quality</span> <span class="k">if</span> <span class="n">module_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">module_quality</span><span class="p">,</span>
+                <span class="s2">&quot;module_mismatch_coefficient&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">module_mismatch_coefficient</span> <span class="k">if</span> <span class="n">module_mismatch_coefficient</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                                                <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">module_mismatch_coefficient</span><span class="p">),</span>
+                <span class="s2">&quot;light_induced_degradation&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">light_induced_degradation</span> <span class="k">if</span> <span class="n">light_induced_degradation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span>
+                                              <span class="n">m</span><span class="o">.</span><span class="n">light_induced_degradation</span><span class="p">),</span>
+                <span class="s2">&quot;dc_wiring_loss_at_stc&quot;</span><span class="p">:</span> <span class="n">dc_wiring_loss_at_stc</span><span class="p">,</span>
+                <span class="s2">&quot;dc_health&quot;</span><span class="p">:</span> <span class="n">dc_health</span><span class="p">,</span>
+                <span class="s2">&quot;heat_balance_conductive_coef&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">heat_balance_conductive_coef</span> <span class="k">if</span> <span class="n">heat_balance_conductive_coef</span> <span class="ow">is</span> <span class="ow">not</span>
+                                                 <span class="kc">None</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">heat_balance_conductive_coef</span><span class="p">),</span>
+                <span class="s2">&quot;heat_balance_convective_coef&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">heat_balance_convective_coef</span> <span class="k">if</span> <span class="n">heat_balance_convective_coef</span> <span class="ow">is</span> <span class="ow">not</span>
+                                                 <span class="kc">None</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">heat_balance_convective_coef</span><span class="p">),</span>
+                <span class="s2">&quot;sandia_conductive_coef&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">sandia_conductive_coef</span> <span class="k">if</span> <span class="n">sandia_conductive_coef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                                           <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">sandia_conductive_coef</span><span class="p">),</span>
+                <span class="s2">&quot;cell_to_module_temp_diff&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">cell_to_module_temp_diff</span> <span class="k">if</span> <span class="n">cell_to_module_temp_diff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span>
+                                             <span class="n">m</span><span class="o">.</span><span class="n">cell_to_module_temp_diff</span><span class="p">),</span>
+                <span class="s2">&quot;sandia_convective_coef&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">sandia_convective_coef</span> <span class="k">if</span> <span class="n">sandia_convective_coef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                                           <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">sandia_convective_coef</span><span class="p">),</span>
+                <span class="s2">&quot;tracker_load_loss&quot;</span><span class="p">:</span> <span class="n">tracker_load_loss</span><span class="p">,</span>
+                <span class="c1"># Advanced Fields</span>
+                <span class="s2">&quot;lateral_intermodule_gap&quot;</span><span class="p">:</span> <span class="n">lateral_intermodule_gap</span><span class="p">,</span>
+                <span class="s2">&quot;vertical_intermodule_gap&quot;</span><span class="p">:</span> <span class="n">vertical_intermodule_gap</span><span class="p">,</span>
+                <span class="s2">&quot;modules_wide&quot;</span><span class="p">:</span> <span class="n">modules_wide</span><span class="p">,</span>
+                <span class="s2">&quot;table_to_table_spacing&quot;</span><span class="p">:</span> <span class="n">table_to_table_spacing</span><span class="p">,</span>
+                <span class="s2">&quot;number_of_rows&quot;</span><span class="p">:</span> <span class="n">number_of_rows</span><span class="p">,</span>
+                <span class="s2">&quot;table_length&quot;</span><span class="p">:</span> <span class="n">table_length</span><span class="p">,</span>
+                <span class="s2">&quot;tables_per_row&quot;</span><span class="p">:</span> <span class="n">tables_per_row</span><span class="p">,</span>
+                <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_dc_field_length</span><span class="p">(</span><span class="n">tables_per_row</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                                                                <span class="n">lateral_intermodule_gap</span><span class="p">,</span> <span class="n">modules_wide</span><span class="p">,</span> <span class="n">tracking_type</span><span class="p">,</span>
+                                                                <span class="n">number_of_rows</span><span class="p">,</span> <span class="n">post_to_post_spacing</span><span class="p">,</span>
+                                                                <span class="n">collector_bandwidth</span><span class="p">),</span>
+                <span class="s2">&quot;field_width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_dc_field_width</span><span class="p">(</span><span class="n">tracking_type</span><span class="p">,</span> <span class="n">number_of_rows</span><span class="p">,</span> <span class="n">post_to_post_spacing</span><span class="p">,</span>
+                                                              <span class="n">collector_bandwidth</span><span class="p">,</span> <span class="n">tables_per_row</span><span class="p">,</span> <span class="n">module_orientation</span><span class="p">,</span>
+                                                              <span class="n">m</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">lateral_intermodule_gap</span><span class="p">,</span> <span class="n">modules_wide</span><span class="p">),</span>
+                <span class="s2">&quot;post_height&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">post_height</span> <span class="k">if</span> <span class="n">post_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_default_post_height</span><span class="p">(</span><span class="n">tracking_type</span><span class="p">,</span> <span class="n">collector_bandwidth</span><span class="p">,</span>
+                                                                         <span class="n">module_tilt</span><span class="p">,</span> <span class="n">minimum_tracking_limit_angle_d</span><span class="p">,</span>
+                                                                         <span class="n">maximum_tracking_limit_angle_d</span><span class="p">)),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># add module tilt if fixed tilt</span>
+        <span class="k">if</span> <span class="n">tracking_type</span> <span class="o">==</span> <span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">FIXED_TILT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">][</span><span class="nb">ord</span><span class="p">(</span><span class="n">inverter_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span><span class="p">][</span>
+                <span class="s2">&quot;dc_fields&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;module_tilt&quot;</span><span class="p">:</span> <span class="n">module_tilt</span><span class="p">})</span>
+
+        <span class="c1"># add backtracking type if horizontal tracker</span>
+        <span class="k">if</span> <span class="n">tracking_type</span> <span class="o">==</span> <span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">HORIZONTAL_TRACKER</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">][</span><span class="nb">ord</span><span class="p">(</span><span class="n">inverter_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span><span class="p">][</span>
+                <span class="s2">&quot;dc_fields&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;tracking_backtracking_type&quot;</span><span class="p">:</span> <span class="n">tracking_backtracking_type</span><span class="p">})</span>
+
+        <span class="c1"># add bifacial parameters if module is bifacial</span>
+        <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">faciality</span> <span class="o">==</span> <span class="n">FacialityEnum</span><span class="o">.</span><span class="n">BIFACIAL</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">][</span><span class="nb">ord</span><span class="p">(</span><span class="n">inverter_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span><span class="p">][</span>
+                <span class="s2">&quot;dc_fields&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                    <span class="s2">&quot;structure_shading&quot;</span><span class="p">:</span> <span class="n">structure_shading</span><span class="p">,</span>
+                    <span class="s2">&quot;backside_mismatch&quot;</span><span class="p">:</span> <span class="n">backside_mismatch</span> <span class="k">if</span> <span class="n">backside_mismatch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">backside_mismatch</span>
+                <span class="p">})</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span>
+            <span class="n">block_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;arrays&quot;</span><span class="p">][</span><span class="n">array_name</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;inverters&quot;</span><span class="p">][</span><span class="nb">ord</span><span class="p">(</span><span class="n">inverter_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span><span class="p">][</span><span class="s2">&quot;dc_fields&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prediction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_cooling_temp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span> <span class="o">=</span> <span class="n">project_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prediction_id</span> <span class="o">=</span> <span class="n">prediction_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_cooling_temp</span> <span class="o">=</span> <span class="n">use_cooling_temp</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transmission_lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># set any provided keyword arguments as attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">PowerPlant</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">api</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Terabase Energy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ <script type="text/javascript">
+    $(document).ready(function() {
+        $(".toggle > *").hide();
+        $(".toggle .header").show();
+        $(".toggle .header").click(function() {
+            $(this).parent().children().not(".header").toggle(400);
+            $(this).parent().children(".header").toggleClass("open");
+        })
+    });
+</script>
+
+
+</body>
+</html>

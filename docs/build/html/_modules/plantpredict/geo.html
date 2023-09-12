@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="python" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plantpredict.geo &mdash; plantpredict-python 1.0.17 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f0215982"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            plantpredict-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authentication_oauth2.html">API Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sdk_reference.html">SDK Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_usage.html">Example Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">plantpredict-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plantpredict.geo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plantpredict.geo</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">plantpredict.utilities</span> <span class="kn">import</span> <span class="n">convert_json</span><span class="p">,</span> <span class="n">camel_to_snake</span><span class="p">,</span> <span class="n">decorate_all_methods</span>
+<span class="kn">from</span> <span class="nn">plantpredict.error_handlers</span> <span class="kn">import</span> <span class="n">handle_refused_connection</span><span class="p">,</span> <span class="n">handle_error_response</span>
+
+
+<div class="viewcode-block" id="Geo">
+<a class="viewcode-back" href="../../sdk_reference.html#plantpredict.geo.Geo">[docs]</a>
+<span class="nd">@decorate_all_methods</span><span class="p">(</span><span class="n">handle_refused_connection</span><span class="p">)</span>
+<span class="nd">@decorate_all_methods</span><span class="p">(</span><span class="n">handle_error_response</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Geo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:mod:`Geo` entity is used to get location-related information for a given latitude/longitude. Its methods can</span>
+<span class="sd">    be used individually, but typically location related info is needed in the context of a PlantPredict</span>
+<span class="sd">    :py:mod:`Project` entity. In this case the user can simply call the method :py:meth:`Project.get_location_info`</span>
+<span class="sd">    which calls all :py:mod:`Geo` class methods and automatically assigns all location-related attributes to that</span>
+<span class="sd">    instance of :py:mod:`Project`. Note: This API resource does not represent a database entity in PlantPredict. This</span>
+<span class="sd">    is a simplified connection to the Google Maps API. See Google Maps API Reference for further functionality.</span>
+<span class="sd">    (https://developers.google.com/maps/)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_location_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **GET** */Geo/* :py:attr:`latitude` */* :py:attr:`longitude` */Location*</span>
+
+<span class="sd">        Retrieves pertinent location info for a given latitude and longitude such as locality, state/province, country,</span>
+<span class="sd">        etc. In addition to returning a dictionary with this information, the method also automatically assigns the</span>
+<span class="sd">        contents of the dictionary to the instance of :py:mod:`Geo` as attributes.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes on object to call this method successfully.</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    latitude; float; North-South GPS coordinate. Must be between :py:data:`-90` and :py:data:`90` - units :py:data:`[decimal degrees]`.</span>
+<span class="sd">                    longitude; float; East-West GPS coordinate Must be between :py:data:`-180` and :py:data:`180` units :py:data:`[decimal degrees]`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                Instantiate a local object instance of :py:mod:`Geo` with latitude and longitude as inputs (which</span>
+<span class="sd">                automatically assigns them as attributes to the object). Then call the method on the object.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    geo = api.geo(latitude=35.1, longitude=-106.7)</span>
+<span class="sd">                    geo.get_location_info()</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Response**</span>
+
+<span class="sd">            .. container:: example_response</span>
+
+<span class="sd">                The method returns a dictionary as shown in the example below, and assigns its contents as attributes</span>
+<span class="sd">                to the local object instance of :py:mod:`Geo`.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;country&quot;: &quot;United States&quot;,</span>
+<span class="sd">                        &quot;country_code&quot;: &quot;US&quot;,</span>
+<span class="sd">                        &quot;locality&quot;: &quot;Albuquerque&quot;,</span>
+<span class="sd">                        &quot;region&quot;: &quot;North America&quot;,</span>
+<span class="sd">                        &quot;state_province&quot;: &quot;New Mexico&quot;,</span>
+<span class="sd">                        &quot;state_province_code&quot;: &quot;NM</span>
+<span class="sd">                    }</span>
+
+<span class="sd">        :return: A dictionary with location information as shown in &quot;Example Response&quot;.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Geo/</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">/Location&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="n">convert_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">camel_to_snake</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">attr</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">get_elevation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **GET** */Geo/* :py:attr:`latitude` */* :py:attr:`longitude` */Elevation*</span>
+
+<span class="sd">        Retrieves the elevation in meters for a given latitude and longitude. In addition to returning a dictionary with</span>
+<span class="sd">        this information, the method also automatically assigns the  contents of the dictionary to the instance of</span>
+<span class="sd">        :py:mod:`Geo` as attributes.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes on object to call this method successfully.</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    latitude; float; North-South GPS coordinate. Must be between :py:data:`-90` and :py:data:`90` - units :py:data:`[decimal degrees]`.</span>
+<span class="sd">                    longitude; float; East-West GPS coordinate Must be between :py:data:`-180` and :py:data:`180` units :py:data:`[decimal degrees]`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                Instantiate a local object instance of :py:mod:`Geo` with latitude and longitude as inputs (which</span>
+<span class="sd">                automatically assigns them as attributes to the object). Then call the method on the object.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    geo = api.geo(latitude=35.1, longitude=-106.7)</span>
+<span class="sd">                    geo.get_elevation()</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Response**</span>
+
+<span class="sd">            .. container:: example_response</span>
+
+<span class="sd">                The method returns a dictionary as shown in the example below, and assigns its contents as attributes</span>
+<span class="sd">                to the local object instance of :py:mod:`Geo`.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;elevation&quot;: 1553.614</span>
+<span class="sd">                    }</span>
+
+<span class="sd">        :return: A dictionary with location information as shown in &quot;Example Response&quot;.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Geo/</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">/Elevation&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="n">convert_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">camel_to_snake</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">attr</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">get_time_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **GET** */Geo/* :py:attr:`latitude` */* :py:attr:`longitude` */TimeZone*</span>
+
+<span class="sd">        Retrieves the time zone as a time shift in hours with respect to GMT for a given latitude and longitude. In</span>
+<span class="sd">        addition to returning a dictionary with this information, the method also automatically assigns the  contents</span>
+<span class="sd">        of the dictionary to the instance of :py:mod:`Geo` as attributes.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Required Attributes**</span>
+
+<span class="sd">            .. container:: required_attributes</span>
+
+<span class="sd">                .. csv-table:: Minimum required attributes on object to call this method successfully.</span>
+<span class="sd">                    :delim: ;</span>
+<span class="sd">                    :header: Field, Type, Description</span>
+<span class="sd">                    :stub-columns: 1</span>
+
+<span class="sd">                    latitude; float; North-South GPS coordinate. Must be between :py:data:`-90` and :py:data:`90` - units :py:data:`[decimal degrees]`.</span>
+<span class="sd">                    longitude; float; East-West GPS coordinate Must be between :py:data:`-180` and :py:data:`180` units :py:data:`[decimal degrees]`.</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Code**</span>
+
+<span class="sd">            .. container:: example_code</span>
+
+<span class="sd">                Instantiate a local object instance of :py:mod:`Geo` with latitude and longitude as inputs (which</span>
+<span class="sd">                automatically assigns them as attributes to the object). Then call the method on the object.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    geo = api.geo(latitude=35.1, longitude=-106.7)</span>
+<span class="sd">                    geo.get_time_zone()</span>
+
+<span class="sd">        .. container:: toggle</span>
+
+<span class="sd">            .. container:: header</span>
+
+<span class="sd">                **Example Response**</span>
+
+<span class="sd">            .. container:: example_response</span>
+
+<span class="sd">                The method returns a dictionary as shown in the example below, and assigns its contents as attributes</span>
+<span class="sd">                to the local object instance of :py:mod:`Geo`.</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;time_zone&quot;: -7.0</span>
+<span class="sd">                    }</span>
+
+<span class="sd">        :return: A dictionary with location information as shown in &quot;Example Response&quot;.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;/Geo/</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">/TimeZone&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">access_token</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="n">convert_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">camel_to_snake</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">attr</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a local object instance of :py:mod:`Geo`.</span>
+
+<span class="sd">        :param api: :py:class:`~plantpredict.api.Api` object.</span>
+<span class="sd">        :type api: object</span>
+<span class="sd">        :param latitude: North-South GPS coordinate. Must be between :py:data:`-90` and :py:data:`90` - units :py:data:`[decimal degrees]`.</span>
+<span class="sd">        :type latitude: float</span>
+<span class="sd">        :param longitude: East-West GPS coordinate Must be between :py:data:`-180` and :py:data:`180` units :py:data:`[decimal degrees]`.</span>
+<span class="sd">        :type longitude: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="n">latitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">longitude</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">Geo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Terabase Energy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ <script type="text/javascript">
+    $(document).ready(function() {
+        $(".toggle > *").hide();
+        $(".toggle .header").show();
+        $(".toggle .header").click(function() {
+            $(this).parent().children().not(".header").toggle(400);
+            $(this).parent().children(".header").toggleClass("open");
+        })
+    });
+</script>
+
+
+</body>
+</html>

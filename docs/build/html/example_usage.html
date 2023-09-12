@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="python" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example Usage &mdash; plantpredict-python 1.0.17 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f0215982"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release Notes" href="release_notes.html" />
+    <link rel="prev" title="SDK Reference" href="sdk_reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            plantpredict-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication_oauth2.html">API Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sdk_reference.html">SDK Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#create-project-and-prediction-from-scratch">Create Project and Prediction from scratch.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-system-level-of-power-plant-transformer-transmission-etc">Model System-Level of Power Plant (Transformer, Transmission, etc.)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#download-nodal-data">Download nodal data.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clone-a-prediction">Clone a prediction.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#change-the-module-in-a-power-plant">Change the module in a power plant.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#change-a-prediction-s-weather-file">Change a prediction's weather file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#change-the-status-of-a-prediction-weather-module-inverter-object">Change the status of a prediction, weather, module, inverter object.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#upload-raw-weather-data">Upload raw weather data.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generate-a-module-file">Generate a module file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#set-a-prediction-s-monthly-factors-albedo-soiling-loss-spectral-loss">Set a prediction's monthly factors (albedo, soiling loss, spectral loss).</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">plantpredict-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Example Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/example_usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example-usage">
+<span id="id1"></span><h1>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading"></a></h1>
+<p>The code snippets below are practical examples of useful tasks accomplished via PlantPredict's API. All of the code
+used in the examples below is available via <a class="reference external" href="https://github.com/plantpredict/python-sdk/tree/main/example_usage">the source code on Github</a>. Feel free to use and modify the
+code in your local environment.</p>
+<p>Every example assumes that you first <code class="code docutils literal notranslate"><span class="pre">import</span> <span class="pre">plantpredict</span></code> and authenticate with
+<a class="reference internal" href="sdk_reference.html#plantpredict.api.Api" title="plantpredict.api.Api"><code class="xref py py-class docutils literal notranslate"><span class="pre">Api</span></code></a> as shown in Step 3 of <a class="reference internal" href="authentication_oauth2.html#authentication-oauth2"><span class="std std-ref">API Authentication</span></a>.</p>
+<section id="create-project-and-prediction-from-scratch">
+<h2>Create Project and Prediction from scratch.<a class="headerlink" href="#create-project-and-prediction-from-scratch" title="Link to this heading"></a></h2>
+<p>This is one example of how to build a project, prediction, and attach a power plant. There are a variety of optional
+settings for every component that can't be captured in a single example. Please refer to the documentation for
+<a class="reference internal" href="sdk_reference.html#plantpredict.project.Project" title="plantpredict.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>, <a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction" title="plantpredict.prediction.Prediction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prediction</span></code></a>, and
+<a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant" title="plantpredict.powerplant.PowerPlant"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerPlant</span></code></a> for more information.</p>
+<p>Instantiate a local instance of <a class="reference internal" href="sdk_reference.html#plantpredict.project.Project" title="plantpredict.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>, assigning <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">latitude</span></code>, and <code class="xref py py-attr docutils literal notranslate"><span class="pre">longitude</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">project</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Grand Canyon Power Plant&quot;</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="mf">36.099</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=-</span><span class="mf">112.112</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Assign location attributes with helper method <a class="reference internal" href="sdk_reference.html#plantpredict.project.Project.assign_location_attributes" title="plantpredict.project.Project.assign_location_attributes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">assign_location_attributes()</span></code></a>, and
+create as the local instance of <a class="reference internal" href="sdk_reference.html#plantpredict.project.Project" title="plantpredict.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a> a new entity in the PlantPredict database.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">project</span><span class="o">.</span><span class="n">assign_location_attributes</span><span class="p">()</span>
+<span class="n">project</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Instantiate a local instance of <a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction" title="plantpredict.prediction.Prediction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prediction</span></code></a>, assigning <code class="xref py py-attr docutils literal notranslate"><span class="pre">project_id</span></code> (from
+the newly created project) and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">prediction</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Grand Canyon - Contracted&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Assign the <code class="xref py py-attr docutils literal notranslate"><span class="pre">weather_id</span></code> corresponding to the weather file you want to use (assuming it already exists in the
+PlantPredict database).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">weather_id</span> <span class="o">=</span> <span class="mi">13628</span>
+</pre></div>
+</div>
+<p>Instantiate and retrieve the weather file, and ensure that the two pairs of prediction start/end attributes match those
+of the weather file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">weather</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">weather</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">prediction</span><span class="o">.</span><span class="n">weather_id</span><span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">start_date</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">start_date</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">end_date</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">end_date</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">start_date</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">end_date</span>
+</pre></div>
+</div>
+<p>Import all of the enumeration files relevant to prediction settings. Set ALL of the following model options on the
+prediction using the enumerations library in <a class="reference internal" href="sdk_reference.html#module-plantpredict.enumerations" title="plantpredict.enumerations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">enumerations</span></code></a> similar to the code below, but to
+your preferences.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">PredictionStatusEnum</span><span class="p">,</span> <span class="n">TranspositionModelEnum</span><span class="p">,</span> <span class="n">SpectralShiftModelEnum</span><span class="p">,</span> \
+    <span class="n">DiffuseDirectDecompositionModelEnum</span><span class="p">,</span> <span class="n">ModuleTemperatureModelEnum</span><span class="p">,</span> <span class="n">IncidenceAngleModelTypeEnum</span><span class="p">,</span> \
+    <span class="n">AirMassModelTypeEnum</span><span class="p">,</span> <span class="n">DirectBeamShadingModelEnum</span><span class="p">,</span> <span class="n">SoilingModelTypeEnum</span><span class="p">,</span> <span class="n">DegradationModelEnum</span><span class="p">,</span> \
+    <span class="n">TrackingTypeEnum</span><span class="p">,</span> <span class="n">BacktrackingTypeEnum</span><span class="p">,</span> <span class="n">DiffuseShadingModelEnum</span>
+
+<span class="n">prediction</span><span class="o">.</span><span class="n">diffuse_direct_decomp_model</span> <span class="o">=</span> <span class="n">DiffuseDirectDecompositionModelEnum</span><span class="o">.</span><span class="n">NONE</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">transposition_model</span> <span class="o">=</span> <span class="n">TranspositionModelEnum</span><span class="o">.</span><span class="n">PEREZ</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">mod_temp_model</span> <span class="o">=</span> <span class="n">ModuleTemperatureModelEnum</span><span class="o">.</span><span class="n">HEAT_BALANCE</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">inc_angle_model</span> <span class="o">=</span> <span class="n">IncidenceAngleModelTypeEnum</span><span class="o">.</span><span class="n">TABULAR_IAM</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">spectral_shift_model</span> <span class="o">=</span> <span class="n">SpectralShiftModelEnum</span><span class="o">.</span><span class="n">TWO_PARAM_PWAT_AND_AM</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">air_mass_model</span> <span class="o">=</span> <span class="n">AirMassModelTypeEnum</span><span class="o">.</span><span class="n">BIRD_HULSTROM</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">direct_beam_shading_model</span> <span class="o">=</span> <span class="n">DirectBeamShadingModelEnum</span><span class="o">.</span><span class="n">LINEAR</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">diffuse_shading_model</span> <span class="o">=</span> <span class="n">DiffuseShadingModelEnum</span><span class="o">.</span><span class="n">SCHAAR_PANCHULA</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">soiling_model</span> <span class="o">=</span> <span class="n">SoilingModelTypeEnum</span><span class="o">.</span><span class="n">CONSTANT_MONTHLY</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">monthly_factors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jan&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Feb&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Mar&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Apr&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;May&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jun&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jul&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Aug&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sep&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Oct&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nov&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Dec&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">diffuse_direct_decomp_model_executed</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">use_meteo_dni</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">use_meteo_poai</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">degradation_model</span> <span class="o">=</span> <span class="n">DegradationModelEnum</span><span class="o">.</span><span class="n">LINEAR_DC</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">linear_degradation_rate</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">first_year_degradation</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">year_repeater</span> <span class="o">=</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<p>Create the prediction in the PlantPredict database.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Change the prediction's status to <code class="xref py py-attr docutils literal notranslate"><span class="pre">plantpredict.enumerations.PredictionStatusEnum.DRAFT-SHARED</span></code> to make it
+accessible to other members of your team (or to another relevant status).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">change_status</span><span class="p">(</span><span class="n">new_status</span><span class="o">=</span><span class="n">PredictionStatusEnum</span><span class="o">.</span><span class="n">DRAFT_SHARED</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;Changed for tutorial.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Instantiate a local instance of <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant" title="plantpredict.powerplant.PowerPlant"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerPlant</span></code></a>, assigning its <code class="xref py py-attr docutils literal notranslate"><span class="pre">project_id</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">prediction_id</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">powerplant</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">prediction_id</span><span class="o">=</span><span class="n">prediction</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add a fixed tilt block, array, inverter, and dc field using <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant.add_block" title="plantpredict.powerplant.PowerPlant.add_block"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_block()</span></code></a>,
+<a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant.add_array" title="plantpredict.powerplant.PowerPlant.add_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_array()</span></code></a>, <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant.add_inverter" title="plantpredict.powerplant.PowerPlant.add_inverter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_inverter()</span></code></a>
+and <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant.add_dc_field" title="plantpredict.powerplant.PowerPlant.add_dc_field"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_dc_field()</span></code></a>, respectively. In this example, not all optional fields
+are used in this method. Refer to each method's documentation for information on what other
+power plant attributes can be configured. Additionally, refer to the <a class="reference external" href="https://plantpredict.com/user_manual/predictions/#power-plant-builder">PlantPredict User Guide</a> for documentation on power plant
+hierarchy.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fixed_tilt_block_name</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">add_block</span><span class="p">()</span>
+<span class="n">fixed_tilt_array_name</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">add_array</span><span class="p">(</span>
+    <span class="n">block_name</span><span class="o">=</span><span class="n">fixed_tilt_block_name</span><span class="p">,</span>
+    <span class="n">transformer_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">repeater</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Arrays in north eastern section of plant.&quot;</span>
+<span class="p">)</span>
+<span class="n">fixed_tilt_inverter_name</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">add_inverter</span><span class="p">(</span>
+    <span class="n">block_name</span><span class="o">=</span><span class="n">fixed_tilt_block_name</span><span class="p">,</span>
+    <span class="n">array_name</span><span class="o">=</span><span class="n">fixed_tilt_array_name</span><span class="p">,</span>
+    <span class="n">inverter_id</span><span class="o">=</span><span class="mi">619</span><span class="p">,</span>
+    <span class="n">setpoint_kw</span><span class="o">=</span><span class="mf">720.0</span><span class="p">,</span>
+    <span class="n">repeater</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Assuming there is one DC field on the inverter, the field DC power can be calculated from a DC AC ratio. If there
+were two identical DC fields on a single inverter, you would use half of the number of strings. For irregular
+configurations, perform a custom calculation for number of strings in parallel and field dc power. Additionally, the
+post to post spacing can be calculated from GCR and some information about the module being used in the DC field. Use
+the helpers to prepare field DC power and post to post spacing, and then add the fixed tilt DC field.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">field_dc_power</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">calculate_field_dc_power_from_dc_ac_ratio</span><span class="p">(</span><span class="n">dc_ac_ratio</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">inverter_setpoint</span><span class="o">=</span><span class="mf">720.0</span><span class="p">)</span>
+<span class="n">post_to_post_spacing</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">calculate_post_to_post_spacing_from_gcr</span><span class="p">(</span><span class="n">ground_coverage_ratio</span><span class="o">=</span><span class="mf">0.40</span><span class="p">,</span> <span class="n">module_id</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                                                                          <span class="n">modules_high</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">fixed_tilt_dc_field_name</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">add_dc_field</span><span class="p">(</span>
+    <span class="n">block_name</span><span class="o">=</span><span class="n">fixed_tilt_block_name</span><span class="p">,</span>
+    <span class="n">array_name</span><span class="o">=</span><span class="n">fixed_tilt_array_name</span><span class="p">,</span>
+    <span class="n">inverter_name</span><span class="o">=</span><span class="n">fixed_tilt_inverter_name</span><span class="p">,</span>
+    <span class="n">module_id</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+    <span class="n">tracking_type</span><span class="o">=</span><span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">FIXED_TILT</span><span class="p">,</span>
+    <span class="n">modules_high</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">modules_wired_in_series</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">post_to_post_spacing</span><span class="o">=</span><span class="n">post_to_post_spacing</span><span class="p">,</span>
+    <span class="n">number_of_rows</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">field_dc_power</span><span class="o">=</span><span class="n">field_dc_power</span><span class="p">,</span>
+    <span class="n">module_tilt</span><span class="o">=</span><span class="mi">30</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can continue to add new blocks, or even add arrays to blocks, inverters to arrays, etc. The code below is an
+example of adding a block with a DC field that uses single-axis tracking.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tracker_block_name</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">add_block</span><span class="p">()</span>
+<span class="n">tracker_array_name</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">add_array</span><span class="p">(</span>
+    <span class="n">block_name</span><span class="o">=</span><span class="n">tracker_block_name</span><span class="p">,</span>
+    <span class="n">transformer_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tracker_inverter_name</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">add_inverter</span><span class="p">(</span>
+    <span class="n">block_name</span><span class="o">=</span><span class="n">tracker_block_name</span><span class="p">,</span>
+    <span class="n">array_name</span><span class="o">=</span><span class="n">tracker_array_name</span><span class="p">,</span>
+    <span class="n">inverter_id</span><span class="o">=</span><span class="mi">619</span><span class="p">,</span>
+    <span class="n">setpoint_kw</span><span class="o">=</span><span class="mf">720.0</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Prepare the field DC power and post to post spacing for the tracker DC field, and then add it to the inverter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">field_dc_power</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">calculate_field_dc_power_from_dc_ac_ratio</span><span class="p">(</span><span class="n">dc_ac_ratio</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">inverter_setpoint</span><span class="o">=</span><span class="mf">720.0</span><span class="p">)</span>
+<span class="n">post_to_post_spacing</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">calculate_post_to_post_spacing_from_gcr</span><span class="p">(</span><span class="n">ground_coverage_ratio</span><span class="o">=</span><span class="mf">0.20</span><span class="p">,</span> <span class="n">module_id</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                                                                          <span class="n">modules_high</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">tracker_dc_field_name</span> <span class="o">=</span> <span class="n">powerplant</span><span class="o">.</span><span class="n">add_dc_field</span><span class="p">(</span>
+    <span class="n">block_name</span><span class="o">=</span><span class="n">tracker_block_name</span><span class="p">,</span>
+    <span class="n">array_name</span><span class="o">=</span><span class="n">tracker_array_name</span><span class="p">,</span>
+    <span class="n">inverter_name</span><span class="o">=</span><span class="n">tracker_inverter_name</span><span class="p">,</span>
+    <span class="n">module_id</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+    <span class="n">tracking_type</span><span class="o">=</span><span class="n">TrackingTypeEnum</span><span class="o">.</span><span class="n">HORIZONTAL_TRACKER</span><span class="p">,</span>
+    <span class="n">modules_high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">modules_wired_in_series</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">post_to_post_spacing</span><span class="o">=</span><span class="n">post_to_post_spacing</span><span class="p">,</span>
+    <span class="n">number_of_rows</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">field_dc_power</span><span class="o">=</span><span class="n">field_dc_power</span><span class="p">,</span>
+    <span class="n">tracking_backtracking_type</span><span class="o">=</span><span class="n">BacktrackingTypeEnum</span><span class="o">.</span><span class="n">TRUE_TRACKING</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Create the local instance of <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant" title="plantpredict.powerplant.PowerPlant"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerPlant</span></code></a> as a new entity in the PlantPredict
+database. Since the id's of the project and prediction created previously were assigned to the PowerPlant, it will
+automatically attach to the prediction in PlantPredict.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The prediction can now be run.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="model-system-level-of-power-plant-transformer-transmission-etc">
+<h2>Model System-Level of Power Plant (Transformer, Transmission, etc.)<a class="headerlink" href="#model-system-level-of-power-plant-transformer-transmission-etc" title="Link to this heading"></a></h2>
+<p>This tutorial details how to model Total System Capacity, Transformers and Transmission Lines for a power plant/energy
+prediction. This can be done upon initial creation of a prediction from scratch (see the example for
+<a class="reference internal" href="#create-project-and-prediction-from-scratch">Create Project and Prediction from scratch.</a>), but for the sake of example, we will consider the case of updating an
+existing power plant.</p>
+<p>Instantiate a <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant" title="plantpredict.powerplant.PowerPlant"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerPlant</span></code></a>, specifying its <code class="xref py py-attr docutils literal notranslate"><span class="pre">project_id</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">prediction_id</span></code> (visible in the URL of that prediction in a web browser
+... <code class="xref py py-data docutils literal notranslate"><span class="pre">/projects/{project_id}/prediction/{id}</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">project_id</span> <span class="o">=</span> <span class="mi">13161</span>   <span class="c1"># CHANGE TO YOUR PROJECT ID</span>
+<span class="n">prediction_id</span> <span class="o">=</span> <span class="mi">147813</span>   <span class="c1"># CHANGE TO YOUR PREDICTION ID</span>
+<span class="n">powerplant</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">powerplant</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">prediction_id</span><span class="o">=</span><span class="n">prediction_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Retrieve the power plant's attributes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Set the system <code class="xref py py-attr docutils literal notranslate"><span class="pre">availability_loss</span></code> on the <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant" title="plantpredict.powerplant.PowerPlant"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerPlant</span></code></a> instance in units
+<code class="xref py py-data docutils literal notranslate"><span class="pre">[%]</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span><span class="o">.</span><span class="n">availability_loss</span> <span class="o">=</span> <span class="mf">1.7</span>
+</pre></div>
+</div>
+<p>Set the plant output (LGIA) limit in units <code class="xref py py-data docutils literal notranslate"><span class="pre">[MWac]</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span><span class="o">.</span><span class="n">lgia_limitation</span> <span class="o">=</span> <span class="mf">0.8</span>
+</pre></div>
+</div>
+<p>Add <code class="xref py py-attr docutils literal notranslate"><span class="pre">transformers</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">transmission_lines</span></code>, specifying the <code class="xref py py-attr docutils literal notranslate"><span class="pre">ordinal</span></code> (1-indexed) such that
+they are in the desired order (where 1 is closest to the physical output of the plant).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span><span class="o">.</span><span class="n">add_transformer</span><span class="p">(</span><span class="n">rating</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">high_side_voltage</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">no_load_loss</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">full_load_loss</span><span class="o">=</span><span class="mf">1.7</span><span class="p">,</span> <span class="n">ordinal</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">powerplant</span><span class="o">.</span><span class="n">add_transmission_line</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">resistance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">number_of_conductors_per_phase</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ordinal</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Call the <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant.update" title="plantpredict.powerplant.PowerPlant.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a> method on the instance of
+<a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant" title="plantpredict.powerplant.PowerPlant"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerPlant</span></code></a> to persist these changes to PlantPredict.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="download-nodal-data">
+<h2>Download nodal data.<a class="headerlink" href="#download-nodal-data" title="Link to this heading"></a></h2>
+<p>First, set up a dictionary containing the nodal data export options. Set the values to True according to which nodes
+in the <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant" title="plantpredict.powerplant.PowerPlant"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerPlant</span></code></a> hierarchy you are interested in exporting nodal data. For each
+block in <code class="xref py py-data docutils literal notranslate"><span class="pre">block_export_options</span></code>, specify the block number (using the field <code class="xref py py-data docutils literal notranslate"><span class="pre">name</span></code>).
+You can add export options for multiple blocks, but in this example we just do one.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">export_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;export_system&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">&#39;block_export_options&#39;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;export_block&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;export_arrays&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;export_inverters&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;export_dc_fields&quot;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Instantiate a new prediction using the <a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction" title="plantpredict.prediction.Prediction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prediction</span></code></a> class, specifying its
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">project_id</span></code> (visible in the URL of that prediction in a web browser
+... <code class="xref py py-data docutils literal notranslate"><span class="pre">/projects/{project_id}/prediction/{id}/</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">project_id</span> <span class="o">=</span> <span class="mi">13161</span>   <span class="c1"># CHANGE TO YOUR PROJECT ID</span>
+<span class="n">prediction_id</span> <span class="o">=</span> <span class="mi">147813</span>   <span class="c1"># CHANGE TO YOUR PREDICTION ID</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">prediction</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">prediction_id</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Run the prediction.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">export_options</span><span class="o">=</span><span class="n">export_options</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Retrieve the nodal data of Array 1 (in Block 1) and DC  Field 1 (in Block 1 --&gt; Array 1 --&gt; Inverter A). Note that
+the lowest node (power plant hierarchy-wise) in the input dictionary specifies the nodal data returned.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nodal_data_array</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">get_nodal_data</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;block_number&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;array_number&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="n">nodal_data_dc_field</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">get_nodal_data</span><span class="p">(</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;block_number&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;array_number&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;inverter_name&#39;</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dc_field_number&#39;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>For system-level nodal data, call the method with no inputs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nodal_data_system</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">get_nodal_data</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The nodal data returned will be returned as JSON serializable data, as detailed in the documentation for
+<a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction.get_nodal_data" title="plantpredict.prediction.Prediction.get_nodal_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_nodal_data()</span></code></a>.</p>
+</section>
+<section id="clone-a-prediction">
+<h2>Clone a prediction.<a class="headerlink" href="#clone-a-prediction" title="Link to this heading"></a></h2>
+<p>Instantiate the prediction you wish to clone using the <a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction" title="plantpredict.prediction.Prediction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prediction</span></code></a> class, specifying
+its <code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">project_id</span></code> (visible in the URL of that prediction in a web browser
+... <code class="xref py py-data docutils literal notranslate"><span class="pre">/projects/{project_id}/prediction/{id}/</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">project_id</span> <span class="o">=</span> <span class="mi">13161</span>   <span class="c1"># CHANGE TO YOUR PROJECT ID</span>
+<span class="n">prediction_id</span> <span class="o">=</span> <span class="mi">147813</span>   <span class="c1"># CHANGE TO YOUR PREDICTION ID</span>
+<span class="n">prediction_to_clone</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">prediction</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">prediction_id</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Clone the prediction, passing in a name for the new prediction. This will create a new prediction within the same
+project that is an exact copy (other than the name) of the original prediction.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new_prediction_id</span> <span class="o">=</span> <span class="n">prediction_to_clone</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">new_prediction_name</span><span class="o">=</span><span class="s1">&#39;Cloned Prediction&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you wish to change something about the new prediction, instantiate a new
+<a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction" title="plantpredict.prediction.Prediction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prediction</span></code></a> with the returned prediction ID, change an attribute, and call the
+<a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction.update" title="plantpredict.prediction.Prediction.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new_prediction</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">prediction</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">new_prediction_id</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
+<span class="n">new_prediction</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">TranspositionModelEnum</span>    <span class="c1"># import at the top of the file</span>
+<span class="n">new_prediction</span><span class="o">.</span><span class="n">transposition_model</span> <span class="o">=</span> <span class="n">TranspositionModelEnum</span><span class="o">.</span><span class="n">HAY</span>
+<span class="n">new_prediction</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="change-the-module-in-a-power-plant">
+<h2>Change the module in a power plant.<a class="headerlink" href="#change-the-module-in-a-power-plant" title="Link to this heading"></a></h2>
+<p>Instantiate the powerplant of the prediction of interest using the
+<a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant" title="plantpredict.powerplant.PowerPlant"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerPlant</span></code></a> class, specifying the <code class="xref py py-attr docutils literal notranslate"><span class="pre">project_id</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">prediction_id</span></code>
+(visible in the URL of that prediction in a web browser ... <code class="xref py py-data docutils literal notranslate"><span class="pre">/projects/{project_id}/prediction/{id}/</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">project_id</span> <span class="o">=</span> <span class="mi">13161</span>   <span class="c1"># CHANGE TO YOUR PROJECT ID</span>
+<span class="n">prediction_id</span> <span class="o">=</span> <span class="mi">147813</span>   <span class="c1"># CHANGE TO YOUR PREDICTION ID</span>
+<span class="n">powerplant</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">powerplant</span><span class="p">(</span><span class="n">prediction_id</span><span class="o">=</span><span class="n">prediction_id</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Retrieve all of its attributes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Specify the <code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code> of the module you want to replace the power plant's current module with (visible in the URL
+of that module in a web browser ... <code class="xref py py-data docutils literal notranslate"><span class="pre">/module/{id}/</span></code>). Retrieve the module.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new_module_id</span> <span class="o">=</span> <span class="mi">3047</span>
+<span class="n">new_module</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">new_module_id</span><span class="p">)</span>
+<span class="n">new_module</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In order to change the module in Block 1 --&gt; Array 1 --&gt; Inverter A --&gt; DC Field 1,
+replace the previous module's data structure, replace the module id, and update the power plant with the
+the <a class="reference internal" href="sdk_reference.html#plantpredict.powerplant.PowerPlant.update" title="plantpredict.powerplant.PowerPlant.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">update()</span></code></a> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">powerplant</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;arrays&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;inverters&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;dc_fields&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;module&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_module</span><span class="o">.</span><span class="vm">__dict__</span>
+<span class="n">powerplant</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;arrays&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;inverters&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;dc_fields&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;module_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_module_id</span>
+<span class="n">powerplant</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="change-a-prediction-s-weather-file">
+<h2>Change a prediction's weather file.<a class="headerlink" href="#change-a-prediction-s-weather-file" title="Link to this heading"></a></h2>
+<p>Instantiate the prediction of interest using the <a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction" title="plantpredict.prediction.Prediction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prediction</span></code></a> class, specifying its
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">project_id</span></code> (visible in the URL of that prediction in a web browser
+... <code class="xref py py-data docutils literal notranslate"><span class="pre">/projects/{project_id}/prediction/{id}/</span></code>). Do the same for the project of interest using the
+<a class="reference internal" href="sdk_reference.html#plantpredict.project.Project" title="plantpredict.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a> class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">project_id</span> <span class="o">=</span> <span class="mi">13161</span>   <span class="c1"># CHANGE TO YOUR PROJECT ID</span>
+<span class="n">prediction_id</span> <span class="o">=</span> <span class="mi">147813</span>   <span class="c1"># CHANGE TO YOUR PREDICTION ID</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">prediction</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">prediction_id</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
+<span class="n">project</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Retrieve the project and prediction's attributes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="n">project</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In this particular case, let's say you are looking for the most recent Meteonorm weather file within a 5-mile
+radius of the project site. Search for all weather files within a 5 mile radius of the project's
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">latitude</span></code>/<code class="xref py py-attr docutils literal notranslate"><span class="pre">longitude</span></code> coordinates.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">weather</span><span class="p">()</span>
+<span class="n">weathers</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">project</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">search_radius</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Filter the results by only Meteonorm weather files.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">WeatherDataProviderEnum</span>  <span class="c1"># should import at the top of your file</span>
+<span class="n">weathers_meteo</span> <span class="o">=</span> <span class="p">[</span><span class="n">weather</span> <span class="k">for</span> <span class="n">weather</span> <span class="ow">in</span> <span class="n">weathers</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">weather</span><span class="p">[</span><span class="s1">&#39;data_provider&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">WeatherDataProviderEnum</span><span class="o">.</span><span class="n">METEONORM</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If there is a weather file that meets the criteria, used the most recently created weather file's <code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code>. If no
+weather file meets the criteria, download a new Meteonorm (or whatever type you are working with) weather file and use
+that <code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">WeatherSourceTypeAPIEnum</span>
+<span class="k">if</span> <span class="n">weathers_meteo</span><span class="p">:</span>
+    <span class="n">created_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;created_date&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weathers_meteo</span><span class="p">]</span>
+    <span class="n">created_dates</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;created_date&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weathers_meteo</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">created_dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">weather_id</span> <span class="o">=</span> <span class="n">weathers_meteo</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">weather</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">weather</span><span class="p">()</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">project</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="n">WeatherSourceTypeAPIEnum</span><span class="o">.</span><span class="n">METEONORM</span><span class="p">)</span>
+    <span class="n">weather_id</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">id</span>
+</pre></div>
+</div>
+<p>Instantiate weather using the weather <code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code> and retrieve all of its attributes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">weather</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">weather</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">weather_id</span><span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Ensure that the prediction <code class="xref py py-attr docutils literal notranslate"><span class="pre">start</span></code>/<code class="xref py py-attr docutils literal notranslate"><span class="pre">end</span></code> attributes match those of the weather file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">start_date</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">start_date</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">end_date</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">end_date</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">start_date</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">end_date</span>
+</pre></div>
+</div>
+<p>Change the <code class="xref py py-attr docutils literal notranslate"><span class="pre">weather_id</span></code> of the prediction and update the prediction.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">weather_id</span> <span class="o">=</span> <span class="n">weather_id</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="change-the-status-of-a-prediction-weather-module-inverter-object">
+<h2>Change the status of a prediction, weather, module, inverter object.<a class="headerlink" href="#change-the-status-of-a-prediction-weather-module-inverter-object" title="Link to this heading"></a></h2>
+<p>In order to change the status of a weather, module or inverter object, one must call a separate &quot;update_status&quot;
+endpoint.  For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">LibraryStatusEnum</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="n">LibraryStatusEnum</span><span class="o">.</span><span class="n">DRAFT_SHARED</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="upload-raw-weather-data">
+<h2>Upload raw weather data.<a class="headerlink" href="#upload-raw-weather-data" title="Link to this heading"></a></h2>
+<p>Whether you are starting with an Excel file, CSV file, SQL query, or other data format, the first step is to get your
+data into a JSON-like format. That format is represented in Python as a list of dictionaries, where each dictionary
+represents a timestamp of weather data. Depending on the initial data format, you can utilize any of Python's
+open-source data tools such as the <a class="reference external" href="https://docs.python.org/2/library/csv.html">native csv library</a> or
+<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_excel.html">pandas</a>. This tutorial skips that step
+and loads pre-processed data from <code class="xref download docutils literal notranslate"><span class="pre">this</span> <span class="pre">JSON</span> <span class="pre">file</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;weather_details.json&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+    <span class="n">weather_details</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using the known latitude and longitude of the weather data location, call
+<a class="reference internal" href="sdk_reference.html#plantpredict.geo.Geo.get_location_info" title="plantpredict.geo.Geo.get_location_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_location_info()</span></code></a> query crucial location info necessary to populate the weather file's
+metadata.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">latitude</span> <span class="o">=</span> <span class="mf">35.0</span>
+<span class="n">longitude</span> <span class="o">=</span> <span class="o">-</span><span class="mf">119.0</span>
+<span class="n">geo</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">geo</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">)</span>
+<span class="n">location_info</span> <span class="o">=</span> <span class="n">geo</span><span class="o">.</span><span class="n">get_location_info</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Initialize the <a class="reference internal" href="sdk_reference.html#plantpredict.weather.Weather" title="plantpredict.weather.Weather"><code class="xref py py-class docutils literal notranslate"><span class="pre">Weather</span></code></a> entity and populate with the minimum fields required by
+<a class="reference internal" href="sdk_reference.html#plantpredict.weather.Weather.create" title="plantpredict.weather.Weather.create"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create()</span></code></a>. Note that the weather details time series data loaded in the first step
+is assigned to <code class="xref py py-attr docutils literal notranslate"><span class="pre">weather_details</span></code> at this point.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">WeatherDataProviderEnum</span>
+<span class="n">weather</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">weather</span><span class="p">()</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Python SDK Test Weather&quot;</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="mf">35.0</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="o">-</span><span class="mf">119.0</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">country</span> <span class="o">=</span> <span class="n">location_info</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">country_code</span> <span class="o">=</span> <span class="n">location_info</span><span class="p">[</span><span class="s1">&#39;country_code&#39;</span><span class="p">]</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">data_provider</span> <span class="o">=</span> <span class="n">WeatherDataProviderEnum</span><span class="o">.</span><span class="n">METEONORM</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">weather_details</span> <span class="o">=</span> <span class="n">weather_details</span>
+</pre></div>
+</div>
+<p>Assign additional metadata fields.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">weather</span><span class="o">.</span><span class="n">elevation</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">geo</span><span class="o">.</span><span class="n">get_elevation</span><span class="p">()[</span><span class="s2">&quot;elevation&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">locality</span> <span class="o">=</span> <span class="n">location_info</span><span class="p">[</span><span class="s1">&#39;locality&#39;</span><span class="p">]</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="n">location_info</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">state_province</span> <span class="o">=</span> <span class="n">location_info</span><span class="p">[</span><span class="s1">&#39;state_province&#39;</span><span class="p">]</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">state_province_code</span> <span class="o">=</span> <span class="n">location_info</span><span class="p">[</span><span class="s1">&#39;state_province_code&#39;</span><span class="p">]</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">time_zone</span> <span class="o">=</span> <span class="n">geo</span><span class="o">.</span><span class="n">get_time_zone</span><span class="p">()[</span><span class="s1">&#39;time_zone&#39;</span><span class="p">]</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">LibraryStatusEnum</span><span class="o">.</span><span class="n">DRAFT_PRIVATE</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">data_type</span> <span class="o">=</span> <span class="n">WeatherDataTypeEnum</span><span class="o">.</span><span class="n">MEASURED</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">p_level</span> <span class="o">=</span> <span class="n">WeatherPLevelEnum</span><span class="o">.</span><span class="n">P95</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">time_interval</span> <span class="o">=</span> <span class="mi">60</span>  <span class="c1"># minutes</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">global_horizontal_irradiance_sum</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+    <span class="nb">sum</span><span class="p">([</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;global_horizontal_irradiance&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weather_details</span><span class="p">])</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span>
+<span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">diffuse_horizontal_irradiance_sum</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+    <span class="nb">sum</span><span class="p">([</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;diffuse_horizontal_irradiance&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weather_details</span><span class="p">])</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span>
+<span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">direct_normal_irradiance_sum</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+    <span class="nb">sum</span><span class="p">([</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;direct_normal_irradiance&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weather_details</span><span class="p">])</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span>
+<span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">average_air_temperature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weather_details</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">average_relative_humidity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weather_details</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">average_wind_speed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;windspeed&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weather_details</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">weather</span><span class="o">.</span><span class="n">max_air_temperature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="nb">max</span><span class="p">([</span><span class="n">w</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weather_details</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create the weather file in PlantPredict with <a class="reference internal" href="sdk_reference.html#plantpredict.weather.Weather.create" title="plantpredict.weather.Weather.create"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create()</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">weather</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="generate-a-module-file">
+<h2>Generate a module file.<a class="headerlink" href="#generate-a-module-file" title="Link to this heading"></a></h2>
+<p>Instantiate a <a class="reference internal" href="sdk_reference.html#plantpredict.module.Module" title="plantpredict.module.Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Module</span></code></a> object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">module</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Assign basic module parameters from the manufacturer's datasheet or similar data source.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">CellTechnologyTypeEnum</span><span class="p">,</span> <span class="n">PVModelTypeEnum</span>
+<span class="n">module</span><span class="o">.</span><span class="n">cell_technology_type</span> <span class="o">=</span> <span class="n">CellTechnologyTypeEnum</span><span class="o">.</span><span class="n">CDTE</span>
+<span class="n">module</span><span class="o">.</span><span class="n">number_of_cells_in_series</span> <span class="o">=</span> <span class="mi">264</span>
+<span class="n">module</span><span class="o">.</span><span class="n">pv_model</span> <span class="o">=</span> <span class="n">PVModelTypeEnum</span><span class="o">.</span><span class="n">ONE_DIODE_RECOMBINATION</span>
+<span class="n">module</span><span class="o">.</span><span class="n">reference_temperature</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">module</span><span class="o">.</span><span class="n">reference_irradiance</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">module</span><span class="o">.</span><span class="n">stc_max_power</span> <span class="o">=</span> <span class="mf">430.0</span>
+<span class="n">module</span><span class="o">.</span><span class="n">stc_short_circuit_current</span> <span class="o">=</span> <span class="mf">2.54</span>
+<span class="n">module</span><span class="o">.</span><span class="n">stc_open_circuit_voltage</span> <span class="o">=</span> <span class="mf">219.2</span>
+<span class="n">module</span><span class="o">.</span><span class="n">stc_mpp_current</span> <span class="o">=</span> <span class="mf">2.355</span>
+<span class="n">module</span><span class="o">.</span><span class="n">stc_mpp_voltage</span> <span class="o">=</span> <span class="mf">182.55</span>
+<span class="n">module</span><span class="o">.</span><span class="n">stc_power_temp_coef</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.32</span>
+<span class="n">module</span><span class="o">.</span><span class="n">stc_short_circuit_current_temp_coef</span> <span class="o">=</span> <span class="mf">0.04</span>
+<span class="n">module</span><span class="o">.</span><span class="n">stc_open_circuit_voltage_temp_coef</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.28</span>
+</pre></div>
+</div>
+<p>Generate single diode parameters using the
+<a class="reference external" href="https://plantpredict.com/algorithm/module-file-generator/">default algorithm/assumptions</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">module</span><span class="o">.</span><span class="n">generate_single_diode_parameters_default</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>At this point, the user could simply add the remaining required fields and save the new module. Alternatively, the
+user can tune the module's single diode parameters to achieve (close to) a desired effective irradiance
+response (EIR)/low-light performance. The first step is to define target relative efficiencies at specified
+irradiance.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">module</span><span class="o">.</span><span class="n">effective_irradiance_response</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s1">&#39;irradiance&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;relative_efficiency&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s1">&#39;irradiance&#39;</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span> <span class="s1">&#39;relative_efficiency&#39;</span><span class="p">:</span> <span class="mf">1.0029</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s1">&#39;irradiance&#39;</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span> <span class="s1">&#39;relative_efficiency&#39;</span><span class="p">:</span> <span class="mf">1.0003</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s1">&#39;irradiance&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;relative_efficiency&#39;</span><span class="p">:</span> <span class="mf">0.9872</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s1">&#39;irradiance&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;relative_efficiency&#39;</span><span class="p">:</span> <span class="mf">0.944</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>How a user chooses to tune the module's performance is relatively open-ended, but a good place to start is using
+PlantPredict's <a class="reference external" href="https://plantpredict.com/algorithm/module-file-generator/#optimize-series-resistance-to-match-eir-algorithm">Optimize Series Resistance&quot; algorithm</a>.
+This will automatically change the series resistance to generate an EIR closer to the target, and re-calculate all
+single-diode parameters dependent on series resistance.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">module</span><span class="o">.</span><span class="n">optimize_series_resistance</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>At any point the user can check the current model-calculated EIR to compare it to the target.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">calculated_effective_irradiance_response</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">calculate_effective_irradiance_response</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An IV curve can be generated for the module for reference.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">iv_curve_at_stc</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">generate_iv_curve</span><span class="p">(</span><span class="n">num_iv_points</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The initial series resistance optimization might not achieve an EIR close enough to the target. the user can modify
+any parameter, re-optimize series resistance or just recalculate dependent parameters, and check EIR repeatedly.
+This is the open-ended portion of module file generation. Important Note: after modifying parameters, if the user
+does not re-optimize series resistance, <a class="reference internal" href="sdk_reference.html#plantpredict.module.Module.generate_single_diode_parameters_advanced" title="plantpredict.module.Module.generate_single_diode_parameters_advanced"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_single_diode_parameters_advanced()</span></code></a>
+must be called to re-calculate <code class="xref py py-attr docutils literal notranslate"><span class="pre">saturation_current_at_stc</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">diode_ideality_factor_at_stc</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">light_generated_current</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">linear_temperature_dependence_on_gamma</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">maximum_series_resistance</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">maximum_recombination_parameter</span></code> (if applicable).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">module</span><span class="o">.</span><span class="n">shunt_resistance_at_stc</span> <span class="o">=</span> <span class="mi">8000</span>
+<span class="n">module</span><span class="o">.</span><span class="n">dark_shunt_resistance</span> <span class="o">=</span> <span class="mi">9000</span>
+<span class="n">module</span><span class="o">.</span><span class="n">generate_single_diode_parameters_advanced</span><span class="p">()</span>
+<span class="n">new_eir</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">calculate_effective_irradiance_response</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Once the user is satisfied with the module parameters and performance, assign other required fields.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">ConstructionTypeEnum</span>
+<span class="n">module</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Test Module&quot;</span>
+<span class="n">module</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;Test Module&quot;</span>
+<span class="n">module</span><span class="o">.</span><span class="n">manufacturer</span> <span class="o">=</span> <span class="s2">&quot;Solar Company&quot;</span>
+<span class="n">module</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">2009</span>
+<span class="n">module</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">1232</span>
+<span class="n">module</span><span class="o">.</span><span class="n">heat_absorption_coef_alpha_t</span> <span class="o">=</span> <span class="mf">0.9</span>
+<span class="n">module</span><span class="o">.</span><span class="n">construction_type</span> <span class="o">=</span> <span class="n">ConstructionTypeEnum</span><span class="o">.</span><span class="n">GLASS_GLASS</span>
+</pre></div>
+</div>
+<p>Create a new <a class="reference internal" href="sdk_reference.html#plantpredict.module.Module" title="plantpredict.module.Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Module</span></code></a> in the PlantPredict database.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">module</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="set-a-prediction-s-monthly-factors-albedo-soiling-loss-spectral-loss">
+<h2>Set a prediction's monthly factors (albedo, soiling loss, spectral loss).<a class="headerlink" href="#set-a-prediction-s-monthly-factors-albedo-soiling-loss-spectral-loss" title="Link to this heading"></a></h2>
+<p>Monthly albedo, soiling loss <code class="xref py py-data docutils literal notranslate"><span class="pre">[%]</span></code>, and spectral loss <code class="xref py py-data docutils literal notranslate"><span class="pre">[%]</span></code> can all be set for a prediction with the
+attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">monthly_factors</span></code> (a py:data:<cite>dict</cite>). This can be done upon initial creation of a prediction from
+scratch (see the example for <a class="reference internal" href="#create-project-and-prediction-from-scratch">Create Project and Prediction from scratch.</a>), but for the sake of example, we will
+consider the case of updating an existing prediction.</p>
+<p>First instantiate the prediction of interest using the <a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction" title="plantpredict.prediction.Prediction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prediction</span></code></a> class, specifying
+its <code class="xref py py-attr docutils literal notranslate"><span class="pre">id</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">project_id</span></code> (visible in the URL of that prediction in a web browser
+... <code class="xref py py-data docutils literal notranslate"><span class="pre">/projects/{project_id}/prediction/{id}/</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">project_id</span> <span class="o">=</span> <span class="mi">13161</span>  <span class="c1"># CHANGE TO YOUR PROJECT ID</span>
+<span class="n">prediction_id</span> <span class="o">=</span> <span class="mi">147813</span>  <span class="c1"># CHANGE TO YOUR PREDICTION ID</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">prediction</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">prediction_id</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Retrieve the prediction's attributes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This example assumes that the user wants to specify all 3 available <code class="xref py py-attr docutils literal notranslate"><span class="pre">monthly_factors</span></code>, and enforce that the
+prediction use monthly soiling loss and spectral loss averages. (Alternatively, a user can choose to only specify
+albedo, or albedo and soiling loss, or albedo and spectral shift.)</p>
+<p>Set the <code class="xref py py-attr docutils literal notranslate"><span class="pre">monthly_factors</span></code> as such, where albedo is in units <code class="xref py py-data docutils literal notranslate"><span class="pre">[decimal]</span></code>, soiling loss in
+<code class="xref py py-data docutils literal notranslate"><span class="pre">[%]</span></code>, and spectral loss in <code class="xref py py-data docutils literal notranslate"><span class="pre">[%]</span></code>. (Note: for soiling loss and spectral loss, a negative number
+indicates a gain.) The values below should be replaced with those obtained from measurements or otherwise relevant to
+the project being modeled.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">monthly_factors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jan&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.40</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">0.958</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Feb&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.24</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">2.48</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Mar&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.76</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">3.58</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Apr&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.88</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">3.48</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;May&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.81</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">2.58</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jun&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">1.01</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">1.94</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jul&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">1.21</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">3.7</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Aug&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.99</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">4.57</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sep&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">1.34</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">6.39</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Oct&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.54</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">4.16</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nov&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.52</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">0.758</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;month_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Dec&quot;</span><span class="p">,</span> <span class="s2">&quot;albedo&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">&quot;soiling_loss&quot;</span><span class="p">:</span> <span class="mf">0.33</span><span class="p">,</span> <span class="s2">&quot;spectral_shift&quot;</span><span class="p">:</span> <span class="mf">0.886</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>In order to enforce that the prediction use monthly average values (rather than soiling time series from a weather
+file, for instance), the attributes <code class="xref py py-attr docutils literal notranslate"><span class="pre">soiling_model</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">spectral_shift_model</span></code> must be set with the
+following code (assuming that both soiling loss and spectral shift loss have been specified in
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">monthly</span> <span class="pre">factors</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plantpredict.enumerations</span> <span class="kn">import</span> <span class="n">SoilingModelTypeEnum</span><span class="p">,</span> <span class="n">SpectralShiftModelEnum</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">soiling_model</span> <span class="o">=</span> <span class="n">SoilingModelTypeEnum</span><span class="o">.</span><span class="n">CONSTANT_MONTHLY</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">spectral_shift_model</span> <span class="o">=</span> <span class="n">SpectralShiftModelEnum</span><span class="o">.</span><span class="n">MONTHLY_OVERRIDE</span>
+</pre></div>
+</div>
+<p>Call the <a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction.update" title="plantpredict.prediction.Prediction.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a> method on the instance of
+<a class="reference internal" href="sdk_reference.html#plantpredict.prediction.Prediction" title="plantpredict.prediction.Prediction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prediction</span></code></a> to persist these changes to PlantPredict.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sdk_reference.html" class="btn btn-neutral float-left" title="SDK Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="release_notes.html" class="btn btn-neutral float-right" title="Release Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Terabase Energy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ <script type="text/javascript">
+    $(document).ready(function() {
+        $(".toggle > *").hide();
+        $(".toggle .header").show();
+        $(".toggle .header").click(function() {
+            $(this).parent().children().not(".header").toggle(400);
+            $(this).parent().children(".header").toggleClass("open");
+        })
+    });
+</script>
+
+
+</body>
+</html>

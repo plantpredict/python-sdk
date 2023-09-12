@@ -415,6 +415,8 @@ the :py:func:`~plantpredict.powerplant.PowerPlant.update` method.
     powerplant.update()
 
 
+
+
 Change a prediction's weather file.
 ------------------------------------
 
@@ -492,6 +494,18 @@ Change the :py:attr:`weather_id` of the prediction and update the prediction.
 
     prediction.weather_id = weather_id
     prediction.update()
+
+
+Change the status of a prediction, weather, module, inverter object.
+------------------------------------
+In order to change the status of a weather, module or inverter object, one must call a separate "update_status"
+endpoint.  For example:
+
+.. code-block:: python
+
+    from plantpredict.enumerations import LibraryStatusEnum
+    prediction.update_status(LibraryStatusEnum.DRAFT_SHARED)
+
 
 Upload raw weather data.
 -------------------------
