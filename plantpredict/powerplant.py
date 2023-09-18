@@ -284,7 +284,7 @@ class PowerPlant(PlantPredictEntity):
 
     def _calculate_sum_power_factors(self):
         """
-        Calculates the sum of all of the inverter power factors (design derate) in the power plant by iterating through
+        Calculates the sum of all the inverter power factors (design derate) in the power plant by iterating through
         each array of each block of :py:attr:`blocks`.
 
         :return: Sum of all power factors of each inverter in the power plant.

@@ -1,6 +1,7 @@
 import json
 import requests
 import pandas
+import json
 from operator import itemgetter
 from itertools import groupby
 
@@ -309,6 +310,51 @@ class Module(PlantPredictEntity):
         """
         self.update_url_suffix = "/Module"
         return super(Module, self).update()
+
+    @handle_refused_connection
+    @handle_error_response
+    def upload_pan_file(self, file_name=None, file_path=None):
+        """
+        creates a new module from a source .pan file
+        """
+        json_parse = requests.post(
+            url=self.api.base_url + "/Module/ImportPANFile",
+            files=[('fileName', (file_name, open(file_path, 'rb'), 'application/octet-stream'))],
+            headers={"Authorization": "Bearer " + self.api.access_token},
+           )
+
+        create_request = requests.post(
+            url=self.api.base_url + "/Module/CreatePANFileModule",
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=json.loads(json_parse.content),
+           )
+        return json.loads(create_request.content)
+
+    @handle_refused_connection
+    @handle_error_response
+    def parse_pan_file(self, file_name=None, file_path=None):
+        """
+        creates a new module from a source .pan file
+        """
+        json_parse = requests.post(
+            url=self.api.base_url + "/Module/ImportPANFile",
+            files=[('fileName', (file_name, open(file_path, 'rb'), 'application/octet-stream'))],
+            headers={"Authorization": "Bearer " + self.api.access_token},
+           )
+        return json.loads(json_parse.content)
+
+    @handle_refused_connection
+    @handle_error_response
+    def create_from_json(self, json_module=None):
+        """
+        creates a new module from a source JSON file
+        """
+        create_request = requests.post(
+            url=self.api.base_url + "/Module",
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=json_module,
+           )
+        return json.loads(create_request.content)
 
     @handle_refused_connection
     @handle_error_response

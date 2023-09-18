@@ -1,5 +1,5 @@
 import requests
-
+import json
 from plantpredict.plant_predict_entity import PlantPredictEntity
 from plantpredict.error_handlers import handle_refused_connection, handle_error_response, APIError
 from plantpredict.enumerations import EntityTypeEnum
@@ -27,6 +27,52 @@ class Inverter(PlantPredictEntity):
         """PUT /Inverter"""
         self.update_url_suffix = "/Inverter".format(self.id)
         return super(Inverter, self).update()
+
+    @handle_refused_connection
+    @handle_error_response
+    def upload_ond_file(self, file_name=None, file_path=None):
+        """
+        creates a new inverter from a source .ond file
+        """
+        json_parse = requests.post(
+            url=self.api.base_url + "/Inverter/ParseONDFile",
+            files=[('fileName', (file_name, open(file_path, 'rb'), 'application/octet-stream'))],
+            headers={"Authorization": "Bearer " + self.api.access_token},
+           )
+
+        create_request = requests.post(
+            url=self.api.base_url + "/Inverter",
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=json.loads(json_parse.content),
+           )
+
+        return json.loads(create_request.content)
+
+    @handle_refused_connection
+    @handle_error_response
+    def parse_ond_file(self, file_name=None, file_path=None):
+        """
+        creates a new inverter from a source .ond file
+        """
+        json_parse = requests.post(
+            url=self.api.base_url + "/Inverter/ParseONDFile",
+            files=[('fileName', (file_name, open(file_path, 'rb'), 'application/octet-stream'))],
+            headers={"Authorization": "Bearer " + self.api.access_token},
+           )
+        return json.loads(json_parse.content)
+
+    @handle_refused_connection
+    @handle_error_response
+    def create_from_json(self, json_inverter=None):
+        """
+        creates a new inverter from a source JSON file
+        """
+        create_request = requests.post(
+            url=self.api.base_url + "/Inverter",
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=json_inverter,
+           )
+        return json.loads(create_request.content)
 
     @handle_refused_connection
     @handle_error_response
