@@ -760,3 +760,63 @@ Call the :py:meth:`~plantpredict.prediction.Prediction.update` method on the ins
 
     prediction.update()
 
+
+Upload a module .PAN file.
+------------------------
+The PlantPredict API has two related endpoints, the first which will parse the contents of the provided .PAN file
+and return a PlantPredict compatible JSON object. The second, which is the POST :py:attr:`/Module` endpoint where the
+module JSON can be sent in order to create the module within PlantPredict.
+
+Option 1: One-Step Parse & Upload
+This approach only requires one function call and will request, process, and upload the parsed contents.
+
+.. code-block:: python
+
+    file_name = "FS-6455-P CdTe October2020_v687.PAN"
+    file_path = "python-sdk\\example_usage\\FS-6480-P CdTe January2022_v7211.PAN"
+    moduleRequest = api.module()
+    new_moduleId = moduleRequest.upload_pan_file(file_name, file_path)
+
+Option 2: Two-Step Parse, Edit, & Upload
+This approach gives you the opportunity to view and modify the parsed contents prior to adding the
+module to PlantPredict
+
+.. code-block:: python
+
+    file_name = "FS-6455-P CdTe October2020_v687.PAN"
+    file_path = "python-sdk\\example_usage\\FS-6480-P CdTe January2022_v7211.PAN"
+    moduleRequest = api.module()
+    new_module_JSON = moduleRequest.parse_pan_file(file_name, file_path)
+    new_module_JSON['name'] += " SDK Example Name Edit"
+    moduleRequest.create_from_json(new_module_JSON)
+
+
+Upload an inverter .OND file.
+------------------------
+The PlantPredict API has two related endpoints, the first which will parse the contents of the provided .OND file
+and return a PlantPredict compatible JSON inverter. The second, which is the POST :py:attr:`/Inverter` endpoint where
+the inverter JSON can be sent in order to create the inverter within PlantPredict.
+
+Option 1: One-Step Parse & Upload
+This approach only requires one function call and will request, process, and upload the parsed contents.
+
+.. code-block:: python
+
+    file_name = "Huawei_SUN2000-60KTL_M0_480V.OND"
+    file_path = "python-sdk\\example_usage\\Huawei_SUN2000-60KTL_M0_480V.OND"
+    inverter_request = api.inverter()
+    new_inverterId = inverter_request.upload_ond_file(file_name, file_path)
+
+Option 2: Two-Step Parse, Edit, & Upload
+This approach gives you the opportunity to view and modify the parsed contents prior to adding the
+module to PlantPredict
+
+.. code-block:: python
+
+    file_name = "Huawei_SUN2000-60KTL_M0_480V.OND"
+    file_path = "python-sdk\\example_usage\\Huawei_SUN2000-60KTL_M0_480V.OND"
+    inverter_request = api.inverter()
+    new_inverter_JSON = inverter_request.parse_ond_file(file_name, file_path)
+    new_inverter_JSON['name'] += " SDK Example Name Edit"
+    inverter_request.create_from_json(new_inverter_JSON)
+
