@@ -1,6 +1,8 @@
 import copy
 import math
 import numpy as np
+import json
+import requests
 
 from plantpredict.plant_predict_entity import PlantPredictEntity
 from plantpredict.error_handlers import handle_refused_connection, handle_error_response, APIError
@@ -266,6 +268,22 @@ class PowerPlant(PlantPredictEntity):
         self.get_url_suffix = "/Project/{}/Prediction/{}/PowerPlant".format(self.project_id, self.prediction_id)
         return super(PowerPlant, self).get()
 
+    def get_json(self):
+        url_suffix = "/Project/{}/Prediction/{}/PowerPlant".format(self.project_id, self.prediction_id)
+        create_request = requests.get(
+            url=self.api.base_url + url_suffix,
+            headers={"Authorization": "Bearer " + self.api.access_token},
+           )
+        return json.loads(create_request.content)
+
+    def update_from_json(self, json_power_plant=None):
+        url_suffix = "/Project/{}/Prediction/{}/PowerPlant".format(self.project_id, self.prediction_id)
+        create_request = requests.put(
+            url=self.api.base_url + url_suffix,
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=json_power_plant,
+           )
+        return json.loads(create_request.content)
     def update(self):
         """
         **PUT** */Project/* :py:attr:`project_id` */Prediction/* :py:attr:`prediction_id` */PowerPlant*

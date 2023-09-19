@@ -414,7 +414,21 @@ the :py:func:`~plantpredict.powerplant.PowerPlant.update` method.
     powerplant.blocks[0]['arrays'][0]['inverters'][0]['dc_fields'][0]['module_id'] = new_module_id
     powerplant.update()
 
+Change various power plant properties
+____________________________________
+The SDK supports direct JSON modifcation with the power plant entity as an alternative way to adjust your power plant
+configuration. Below is an example of a very simple way to get a power plant configuration, modify the desired fields,
+and save those changes.
 
+.. code-block:: python
+    project_id = 132771 # CHANGE TO YOUR PROJECT ID
+    prediction_id = 706864 # CHANGE TO YOUR PREDICTION ID
+    power_plant = api.powerplant(project_id=project_id, prediction_id=prediction_id).get_json()
+    power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['postHeight'] = 2.55
+    power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['moduleId'] = 42169
+    power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['rowSpacing'] = 10.5
+    power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['moduleAzimuth'] = 270
+    api.powerplant(project_id=project_id, prediction_id=prediction_id).update_from_json(power_plant)
 
 
 Change a prediction's weather file.
