@@ -114,6 +114,7 @@ class IncidenceAngleModelTypeEnum(object):
     ASHRAE = 3
     NONE = 4
     TABULAR_IAM = 5
+    PHYSICAL = 6
 
 
 class LibraryStatusEnum(object):
