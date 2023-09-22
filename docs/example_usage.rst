@@ -342,6 +342,29 @@ The nodal data returned will be returned as JSON serializable data, as detailed 
 :py:func:`~plantpredict.prediction.Prediction.get_nodal_data`.
 
 
+Get Prediction Result Summary.
+-------------------
+Instantiate the prediction you wish to retrieve results for by using the :py:class:`~plantpredict.prediction.Prediction` class, specifying
+its :py:attr:`id` and :py:attr:`project_id` (visible in the URL of that prediction in a web browser
+... :py:data:`/projects/{project_id}/prediction/{id}/`).
+
+.. code-block:: python
+
+    project_id = 132509 # CHANGE TO YOUR PROJECT ID
+    prediction_id = 707667 # CHANGE TO YOUR PREDICTION ID
+    prediction = api.prediction(id=prediction_id, project_id=project_id)
+
+When retrieving the results, you can provide a parameter to the :py:attr:`get_results_summary()` function of
+:py:attr:`negate_losses=True` if you wish to see the corrected loss factors values (which are shown in the
+PlantPredictUI). If you wish to get the raw, un-corrected loss data, either omit this parameter or specify a value of
+`False`.
+
+.. code-block:: python
+
+    results = prediction.get_results_summary(negate_losses=True)
+
+
+
 Clone a prediction.
 -------------------
 

@@ -1,7 +1,9 @@
+import re
 import requests
+import json
 
 from plantpredict.plant_predict_entity import PlantPredictEntity
-from plantpredict.utilities import convert_json, snake_to_camel
+from plantpredict.utilities import convert_json, snake_to_camel, camel_to_snake
 from plantpredict.error_handlers import handle_refused_connection, handle_error_response, APIError
 from plantpredict.enumerations import PredictionStatusEnum, EntityTypeEnum
 
@@ -202,7 +204,7 @@ class Prediction(PlantPredictEntity):
 
     @handle_refused_connection
     @handle_error_response
-    def get_results_summary(self):
+    def get_results_summary(self, negate_losses=False):
         """GET /Project/{ProjectId}/Prediction/{Id}/ResultSummary"""
 
         response = requests.get(
@@ -211,6 +213,50 @@ class Prediction(PlantPredictEntity):
         )
         if not response.status_code == 200:
             raise APIError(response.status_code, response.content, response.url)
+
+        if negate_losses:
+            results = json.loads(response.content)
+            for year in results['years']:
+                for factor in year['monthlyFactors']:
+                    factor['soilingLoss'] *= -1
+                    if factor['spectralShift'] is not None:
+                        factor['spectralShift'] *= -1
+
+                for ttl in year['transformerTransmissionLineLoss']:
+                    ttl['loss'] *= -1
+
+                year['transpositionOnPlane'] *= -1
+                year['farShadingLoss'] *= -1
+                year['nearShadingLoss'] *= -1
+                year['elecShadingLoss'] *= -1
+                year['soilingLoss'] *= -1
+                year['iamFactorLoss'] *= -1
+                year['spectralLoss'] *= -1
+                year['moduleIrradianceLoss'] *= -1
+                year['moduleTemperatureLoss'] *= -1
+                year['moduleQualityLoss'] *= -1
+                year['lidLoss'] *= -1
+                year['moduleMismatchLoss'] *= -1
+                year['moduleBackMismatchLoss'] *= -1
+                year['biFacialityLoss'] *= -1
+                year['structureShadingLoss'] *= -1
+                year['backsideIrradiance'] *= -1
+                year['dcWiringLoss'] *= -1
+                year['dcHealthLoss'] *= -1
+                year['inverterEfficiencyLoss'] *= -1
+                year['inverterLimitationLoss'] *= -1
+                year['degradationLoss'] *= -1
+                year['leTIDLoss'] *= -1
+                year['inverterCoolingLoss'] *= -1
+                year['trackerMotorLoss'] *= -1
+                year['dataAcquisitionAuxLoss'] *= -1
+                year['mvTransformersLoss'] *= -1
+                year['acCollectionLinesLoss'] *= -1
+                year['availabilityLoss'] *= -1
+                year['lgiaLimitationLoss'] *= -1
+
+            # convert_json(response.json(), camel_to_snake)
+            return convert_json(results, camel_to_snake)
 
         return response
 
@@ -225,6 +271,7 @@ class Prediction(PlantPredictEntity):
         )
         if not response.status_code == 200:
             raise APIError(response.status_code, response.content, response.url)
+
         return response
 
     @handle_refused_connection
