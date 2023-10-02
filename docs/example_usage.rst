@@ -341,6 +341,26 @@ For system-level nodal data, call the method with no inputs.
 The nodal data returned will be returned as JSON serializable data, as detailed in the documentation for
 :py:func:`~plantpredict.prediction.Prediction.get_nodal_data`.
 
+Download Specific Nodal Data Outputs.
+-------------------
+The :py:func:`~plantpredict.prediction.Prediction.get_nodal_data` also supports an optional parameter for the requested
+output fields. For example, the DCField nodal data request from above can be modified to only return a subset of
+the available fields. The example below will result in only the specified output values being returned from the
+PlantPredict API. This can be very useful when dealing with large datasets or filtering out erroneous outputs. For a
+complete list of available parameters, `visit our API documentation
+<https://documenter.getpostman.com/view/3855302/UVsHUoHa#f580d39f-980d-4017-8476-63d9f1f1c88a>`_.
+
+
+.. code-block:: python
+
+    nodal_data_dc_field = prediction.get_nodal_data(params = {
+        'block_number': 1,
+        'array_number': 1,
+        'inverter_name': 'A',
+        'dc_field_number': 1,
+        'nodal_parameters': 'SunZenithAngle,SunAzimuthAngle,ModuleTrackerAngle,ModuleAzimuthAngle,IncidenceAngle'
+    })
+
 
 Get Prediction Result Summary.
 -------------------
