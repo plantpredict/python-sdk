@@ -10,6 +10,14 @@ class BacktrackingTypeEnum(object):
     BACKTRACKING = 1    # shade avoidance
 
 
+class CellDesignTypeEnum(object):
+    """Solar Cell Design Types"""
+    FULL_CELL = 0
+    HALF_CELL = 1
+    NA = 2
+    NONE_SPECIFIED = 3
+
+
 class CellTechnologyTypeEnum(object):
     """Cell Technology"""
     NTYPE_MONO_CSI = 1
@@ -115,6 +123,13 @@ class IncidenceAngleModelTypeEnum(object):
     NONE = 4
     TABULAR_IAM = 5
     PHYSICAL = 6
+
+
+class InverterTypeEnum(object):
+    """Inverter Types"""
+    UNSPECIFIED = 0
+    STRING = 1
+    CENTRAL = 2
 
 
 class LibraryStatusEnum(object):
