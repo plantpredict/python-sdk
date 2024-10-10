@@ -475,6 +475,53 @@ and save those changes.
     power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['moduleAzimuth'] = 270
     api.powerplant(project_id=project_id, prediction_id=prediction_id).update_from_json(power_plant)
 
+*New* Update Module
+------------------------------------
+The SDK now supports DCField module updates with included calculations for corresponding fields.
+
+.. code-block:: python
+    project_id = 138261
+    prediction_id = 765544
+    power_plant = api.powerplant(project_id=project_id, prediction_id=prediction_id).get_json()
+
+
+    # Iterate over all dcFields
+    for dc_field in power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields']:
+        # the calculateDCFields can be set to False if you have some DCFields which you do not want to calculate properties for
+        dc_field['calculateDCFields'] = True
+        # the moduleId of the new module you wish to assign
+        dc_field['moduleId'] = 36348
+        
+    # the update_module function will automatically assign the specified module and calculate all properties
+    # for any DCFields with calculateDCFields set to True
+    api.powerplant(project_id=project_id, prediction_id=prediction_id).update_module(power_plant)
+
+*New* Calculate DCField Properties
+------------------------------------
+This function contains all of the calcluations corresponding to a module change, however these calculations are not saved.
+The response will contain all of the updated values however can be inspected and assigned or cherry-picked as neeeded.
+
+.. code-block:: python
+    project_id = 138261
+    prediction_id = 765544
+    power_plant = api.powerplant(project_id=project_id, prediction_id=prediction_id).get_json()
+
+    for dc_field in power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields']:
+        dc_field['calculateDCFields'] = True
+        dc_field['moduleId'] = 36348
+    
+    # get the updated values based on module change
+    calculations = api.powerplant(project_id=project_id, prediction_id=prediction_id).calculate_dcfields(power_plant)
+
+    # compare computed values to persisted values
+    print(calculations['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['moduleId'])
+    print(calculations['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['modulesWide'])
+    print(calculations['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['postToPostSpacing'])
+
+    persisted_power_plant = api.powerplant(project_id=project_id, prediction_id=prediction_id).get_json()
+    print(persisted_power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['moduleId'])
+    print(persisted_power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['modulesWide'])
+    print(persisted_power_plant['blocks'][0]['arrays'][0]['inverters'][0]['dcFields'][0]['postToPostSpacing'])
 
 
 Change a prediction's weather file.
