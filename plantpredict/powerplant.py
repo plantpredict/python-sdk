@@ -284,6 +284,24 @@ class PowerPlant(PlantPredictEntity):
             json=json_power_plant,
            )
         return json.loads(create_request.content)
+    def calculate_dcfields(self, json_power_plant=None):
+        url_suffix = "/Project/{}/Prediction/{}/CalculatePowerPlantFields".format(self.project_id, self.prediction_id)
+        create_request = requests.post(
+            url=self.api.base_url + url_suffix,
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=json_power_plant,
+            )
+        response = json.loads(create_request.content)
+        return response
+    def update_module(self, json_power_plant=None):
+        url_suffix = "/Project/{}/Prediction/{}/CalculatePowerPlantFields".format(self.project_id, self.prediction_id)
+        create_request = requests.post(
+            url=self.api.base_url + url_suffix,
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=json_power_plant,
+            )
+        response = json.loads(create_request.content)  
+        return self.update_from_json(response)
     def update(self):
         """
         **PUT** */Project/* :py:attr:`project_id` */Prediction/* :py:attr:`prediction_id` */PowerPlant*
