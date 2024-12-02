@@ -65,7 +65,7 @@ author = u'Stephen Kaplan, Jesse Milam'
 # built documents.
 #
 # The short X.Y version.
-version = u'1.0.5'
+version = u'1.0.20'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -74,7 +74,7 @@ release = version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = u'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -94,7 +94,7 @@ autosummary_generate = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'classic'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -109,8 +109,8 @@ html_static_path = ['_static']
 
 
 # A workaround for the responsive tables always having annoying scrollbars.
-def setup(app):
-    app.add_stylesheet("no_scrollbars.css")
+# def setup(app):
+#     app.add_stylesheet("no_scrollbars.css")
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
