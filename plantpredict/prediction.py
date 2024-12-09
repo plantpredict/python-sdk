@@ -384,10 +384,12 @@ class Prediction(PlantPredictEntity):
         :param time_series_id:
         :return:
         """
-        return requests.get(
-            url=self.api.base_url + "/Project/{}/Prediction/{}/TimeSeriesData/{}".format(self.project_id, self.id, time_series_id),
+        request = requests.get(
+            url=self.api.base_url + "/Project/{}/Prediction/{}/TimeSeriesData/{}/Details".format(self.project_id, self.id, time_series_id),
             headers={"Authorization": "Bearer " + self.api.access_token}
         )
+
+        return json.loads(request.content)
     @handle_refused_connection
     @handle_error_response
     def add_time_series_json(self, time_series_json):
