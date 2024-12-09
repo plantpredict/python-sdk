@@ -374,3 +374,12 @@ class WeatherTimeResolution(object):
     HALF_HOUR = 1
     HOUR = 2
     MINUTE = 3
+
+class TimeSeriesTypes(object):
+    INVERTER_SET_POINT = 0
+    INVERTER_DERATE = 1
+    TRACKING_ANGLE = 2
+    MODULE_SURFACE_TEMPERATURE = 3
+    LGIA_LIMIT = 4
+    IMPP_ADJUSTMENT = 5
+    VMPP_ADJUSTMENT = 6

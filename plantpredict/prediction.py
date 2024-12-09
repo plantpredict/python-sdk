@@ -1,4 +1,3 @@
-import re
 import requests
 import json
 
@@ -50,7 +49,7 @@ class Prediction(PlantPredictEntity):
 
             .. container:: example_code
 
-                First, import the plantpredict library and receive an authentication [EDIT THIS] plantpredict.self.api.access_token in your
+                First, import the plantpredict library and receive an authentication api.access_token in your
                 Python session, as shown in Step 3 of :ref:`authentication_oauth2`. Then instantiate a local Prediction.
                 object.
 
@@ -362,6 +361,60 @@ class Prediction(PlantPredictEntity):
                 "status": new_status,
                 "note": note
             }]
+        )
+    @handle_refused_connection
+    @handle_error_response
+    def get_time_series_data(self):
+        """
+        GET /Project/{ProjectId}/Prediction/{PredictionId}/TimeSeriesData
+
+        :return:
+        """
+        return requests.get(
+            url=self.api.base_url + "/Project/{}/Prediction/{}/TimeSeriesData".format(self.project_id, self.id),
+            headers={"Authorization": "Bearer " + self.api.access_token}
+        )
+
+    @handle_refused_connection
+    @handle_error_response
+    def get_time_series_details(self, time_series_id):
+        """
+        GET /Project/{ProjectId}/Prediction/{PredictionId}/TimeSeriesData/{TimeSeriesId}
+
+        :param time_series_id:
+        :return:
+        """
+        return requests.get(
+            url=self.api.base_url + "/Project/{}/Prediction/{}/TimeSeriesData/{}".format(self.project_id, self.id, time_series_id),
+            headers={"Authorization": "Bearer " + self.api.access_token}
+        )
+    @handle_refused_connection
+    @handle_error_response
+    def add_time_series_json(self, time_series_json):
+        """
+        POST /Project/{ProjectId}/Prediction/{PredictionId}/TimeSeriesData
+
+        :param time_series_json:
+        :return:
+        """
+        return requests.post(
+            url=self.api.base_url + "/Project/{}/Prediction/{}/TimeSeriesData".format(self.project_id, self.id),
+            headers={"Authorization": "Bearer " + self.api.access_token},
+            json=time_series_json
+        )
+
+    @handle_refused_connection
+    @handle_error_response
+    def delete_time_series_data(self, time_series_id):
+        """
+        DELETE /Project/{ProjectId}/Prediction/{PredictionId}/TimeSeriesData/{TimeSeriesId}
+
+        :param time_series_id:
+        :return:
+        """
+        return requests.delete(
+            url=self.api.base_url + "/Project/{}/Prediction/{}/TimeSeriesData/{}".format(self.project_id, self.id, time_series_id),
+            headers={"Authorization": "Bearer " + self.api.access_token}
         )
 
     def __init__(self, api, id=None, project_id=None, name=None):
