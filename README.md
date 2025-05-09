@@ -5,6 +5,8 @@ Install **latest stable version** via: `pip install plantpredict`.
 
 Install **development version** via GitHub master branch.
 
+Demo edit.
+
 ---
 
 Documentation can be found at https://plantpredict-python.readthedocs.io
