@@ -78,7 +78,7 @@ class Project(PlantPredictEntity):
         return super(Project, self).get()
 
     def update(self):
-        """HTTP Request: PUT /Project
+        """HTTP Request: PUT /Project/{ProjectId}
 
         Updates an existing Project entity in PlantPredict using the full attributes of the local Project instance.
         Calling this method is most commonly preceded by instantiating a local instance of Project with a specified
@@ -87,7 +87,7 @@ class Project(PlantPredictEntity):
         :return: A dictionary {"is_successful": True}.
         :rtype: dict
         """
-        self.update_url_suffix = "/Project"
+        self.update_url_suffix = "/Project/{}".format(self.id)
 
         return super(Project, self).update()
 

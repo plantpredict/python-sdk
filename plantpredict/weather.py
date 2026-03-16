@@ -109,7 +109,7 @@ class Weather(PlantPredictEntity):
         :return: A dictionary {"is_successful": True}.
         :rtype: dict
         """
-        self.update_url_suffix = "/Weather"
+        self.update_url_suffix = "/Weather/{}".format(self.id)
         return super(Weather, self).update()
 
     @handle_refused_connection
