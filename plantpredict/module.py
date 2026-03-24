@@ -308,7 +308,7 @@ class Module(PlantPredictEntity):
         :return: A dictionary {"is_successful": True}.
         :rtype: dict
         """
-        self.update_url_suffix = "/Module"
+        self.update_url_suffix = "/Module/{}".format(self.id)
         return super(Module, self).update()
 
     @handle_refused_connection
