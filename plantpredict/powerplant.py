@@ -526,6 +526,11 @@ class PowerPlant(PlantPredictEntity):
         block_to_clone = [b for b in self.blocks if b['id'] == block_id_to_clone][0]
         block_copy = copy.deepcopy(block_to_clone)
         block_copy["name"] = len(self.blocks) + 1
+
+        block_copy.pop("id")  # remove id from copied block so that PlantPredict will assign a new unique id when block is created
+        if (block_copy["nodal_export_options"] is not None):
+            block_copy["nodal_export_options"].pop("id")  # remove id from nodal export options of copied block so that PlantPredict will assign a new unique id when block is created
+        
         self.blocks.append(block_copy)
         self.update()
 
